@@ -27,8 +27,8 @@ def is_channel_real(channel_name):
 
     is_online()
     response = mo.mate.deployment_parameter(mo.mate.scope, channel_name, 'Trigger') == ''
-    if response:
-        raise LookupError(f"Requested channel '{channel_name}' does not exist/is not enabled in Matrix")
+    # if response:
+    #     raise LookupError(f"Requested channel '{channel_name}' does not exist/is not enabled in Matrix")
 
     return not response
 
@@ -81,6 +81,8 @@ def is_parameter_allowable(a, module, parameter, test=0):
         response = min_max[0] <= a <= min_max[1]
         if not response:
             warnings.warn(f"{parameter} should be within range {min_max[0]} <= {parameter} <= {min_max[1]}. Matrix may die")
+    else:
+        response = None
     return response
 
 

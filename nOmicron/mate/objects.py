@@ -42,6 +42,7 @@ class _Channel(object):
 class _Clock(object):
     """Generates a continuous clock signal at a variable frequency, for use as a trigger source for data acquisition.
      Data cannot be streamed live, only sent in selected buffer chunks."""
+
     def __init__(self, period):
         self.period = period
 
@@ -67,6 +68,7 @@ class _Clock(object):
 
 class _Experiment(object):
     """Core features of the experiment. Can read/change the state of the experiment."""
+
     def Bricklet_Ready(self, test=''):
         p = 'string'
         a = _process(p, [self, _inspect.stack()[0][3]], None, test)
@@ -128,6 +130,7 @@ class _Experiment(object):
 
 class _GapVoltageControl(object):
     """Control the gap voltage between the STM probe and the sample."""
+
     def Preamp_Range(self, a=None, test=0):
         p = 'enum'
         a = _process(p, [self, _inspect.stack()[0][3]], a, test)
@@ -142,6 +145,7 @@ class _GapVoltageControl(object):
 
 class _PiezoControl(object):
     """Controls tip approach."""
+
     def Approach(self, a=None, test=0):
         p = 'unsigned_integer'
         is_parameter_allowable(a, self.__class__.__name__, _inspect.stack()[0][3], test)
@@ -201,6 +205,7 @@ class _PiezoControl(object):
 
 class _Regulator(object):
     """Controls the Z position of the probe."""
+
     def Enable_Z_Offset_Slew_Rate(self, a=None, test=False):
         p = 'boolean'
         a = _process(p, [self, _inspect.stack()[0][3]], a, test)
@@ -268,6 +273,7 @@ class _Regulator(object):
 class _View(object):
     """Allows for the delivery of data. Open the channel with IO.py, set Deliver_Data to True and return data
     with Data() and a callback if desired."""
+
     def Cycle_Count(self, test=0):
         p = 'unsigned_integer'
         a = _process(p, [self, _inspect.stack()[0][3]], None, test)
@@ -307,6 +313,7 @@ class _View(object):
 
 class _XYScanner(object):
     """Controls the image generation of the scan"""
+
     def Angle(self, a=None, test=0):
         p = 'integer'
         is_parameter_allowable(a, self.__class__.__name__, _inspect.stack()[0][3], test)
@@ -464,6 +471,7 @@ class _XYScanner(object):
 
 class _Spectroscopy:
     """Controls spectroscopy. Device 1&2 are the first two channels in the Matrix window."""
+
     def Enable_Feedback_Loop(self, a=None, test=False):
         p = 'boolean'
         a = _process(p, [self, _inspect.stack()[0][3]], a, test)
@@ -706,6 +714,7 @@ def _no_event():
     if kbhit():
         esc = ord(getch()) == 27
     return no_event and not esc
+
 
 def _check_rc():
     if mate.online and not mate.testmode:

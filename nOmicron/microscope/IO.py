@@ -12,8 +12,16 @@ def connect():
     print("Connected Successfully!")
 
 
+def disconnect():
+    """Disconnect from the Matrix."""
+    print("Disconnecting...")
+    mo.experiment.stop()
+    mo.mate.disconnect()
+    print("Disconnected Successfully!")
+
+
 def enable_channel(channel_name):
-    """Enables a channel for measurement.
+    """Enables a channel (e.g. Z_Fw, I_Bw, I_t, Aux1_t, I_V, I_Z) for measurement.
 
     Examples
     --------
@@ -23,6 +31,9 @@ def enable_channel(channel_name):
     """
 
     utils.is_channel_real(channel_name)
+
+    if mo.channel_name != '':
+        disable_channel()
 
     if len(channel_name) != 1 and channel_name[-1] != "t":
         channel_name += "_Spec"

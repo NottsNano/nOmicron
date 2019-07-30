@@ -1,10 +1,41 @@
-import nOmicron.mate.objects as mo
 import numpy as np
+
+import nOmicron.mate.objects as mo
 from nOmicron.microscope import IO
 
 
-def get_continuous_signal(channel_name, sample_points=50, sample_time=1):
-    """Acquire a continuous signal."""
+def get_continuous_signal(channel_name, sample_time, sample_points):
+    """Acquire a continuous signal.
+
+    Parameters
+    -----------
+    channel_name : str
+        The continuous channel to view, e.g. I_t, Z_t, Df_t, Aux1_t
+    sample_time : float
+        The time to acquire in seconds
+    sample_points : int
+        The number of points to acquire
+
+    Returns
+    -------
+    x_data : Numpy array
+    y_data : Numpy array
+
+    Examples
+    --------
+    Acquire 60 points of I(t) data over 0.1 seconds
+    >>> from nOmicron.microscope import IO
+    >>> IO.connect()
+    >>> t, I = get_continuous_signal("I_t", 1e-1, 60)
+    >>> IO.disconnect()
+
+    Acquire 100 points of Z(t) data over 5 seconds
+    >>> from nOmicron.microscope import IO
+    >>> IO.connect()
+    >>> t, I = get_continuous_signal("Z_t", 5, 100)
+    >>> IO.disconnect()
+    """
+
     global view_count, x_data, y_data
     x_data = y_data = None
     view_count = 0
@@ -34,21 +65,47 @@ def get_continuous_signal(channel_name, sample_points=50, sample_time=1):
     return x_data, y_data
 
 
-def get_spectra(channel_name, target_position, start_end=(0, 1), sample_points=50, sample_time=1e-3,
-                repeats=1, forward_back=True):
+def get_point_spectra(channel_name, target_position, start_end, sample_time, sample_points,
+                      repeats=1, forward_back=True):
     """
-    Go to a position and perform spectroscopy.
+    Go to a position and perform fixed point spectroscopy.
 
     Parameters
     ----------
     channel_name : str
+        The channel to acquire from, e.g. I_V, Z_V, Aux2_V
     target_position : list
-        [x, y] in range -1,1
+        [x, y] in the range -1,1
     start_end : tuple
-    sample_points : int
+        Start and end I/Z/Aux2
     sample_time : float
+        The time to acquire in seconds
+    sample_points : int
+        The number of points to acquire
     repeats : int
+        The number of repeat spectra to take for each point
     forward_back : bool
+        Scan in both directions, or just one.
+
+    Returns
+    -------
+    x_data : Numpy array
+    y_data :
+        If performing repeat spectra and:
+            Scanning in both directions: list of list of Numpy arrays, where inner list is [0] forwards, [1] backwards
+            Scanning in one direction: list of Numpy arrays
+        If no repeat spectra and:
+            Scanning in both directions: list of Numpy arrays, where list is [0] forwards, [1] backwards
+            Scanning in one direction: single Numpy array
+
+    Examples
+    --------
+    Acquire 60 points of I(V) data over 10 milliseconds, with tip placed in middle of scan window.
+    >>> from nOmicron.microscope import IO
+    >>> IO.connect()
+    >>> v, I = get_point_spectra("I_V", start_end=[0, 1], target_position=[0, 0], ...
+    >>>                   repeats=3, sample_points=50, sample_time=10e-3, forward_back=True)
+    >>> IO.disconnect()
     """
 
     global view_count, x_data, y_data
@@ -100,12 +157,16 @@ def get_spectra(channel_name, target_position, start_end=(0, 1), sample_points=5
 
     if not forward_back:
         y_data = [item[0] for item in y_data]
-
+    if repeats == 1:
+        y_data = y_data[0]
     return x_data, y_data
+
 
 if __name__ == '__main__':
     IO.connect()
-    t, I = get_continuous_signal("I_t")
+    t, I1 = get_continuous_signal("I_t", sample_time=1, sample_points=50)
 
     # Do a fixed point spec
-    v, I = get_spectra("I_V", [0, 0], repeats=3, sample_time=10e-3, forward_back=True)
+    v, I2 = get_point_spectra("I_V", start_end=[0, 1], target_position=[0, 0],
+                              repeats=3, sample_points=50, sample_time=10e-3, forward_back=True)
+    IO.disconnect()

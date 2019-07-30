@@ -5,6 +5,7 @@ from nOmicron.microscope import IO
 
 
 def view_channel_properties(channel_name):
+    # TODO: Rewrite!
     def read_prop(obj, prop):
         out = getattr(obj, prop)()
         print(prop + ':', out)
@@ -39,6 +40,7 @@ def view_channel_properties(channel_name):
         print('--------------------------------------------------------------')
         for prop in eval(obj_name + '_props'):
             read_prop(obj, prop)
+
     mo.mate.disconnect()
 
 
