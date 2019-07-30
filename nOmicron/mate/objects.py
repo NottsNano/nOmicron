@@ -17,24 +17,31 @@ from .mate import MATE as _MATE
 class _Text(object):
 
     def __init__(self, text):
-        print(text)
         self.text = text
 
     def AppendText(self, text):
-        print(text)
         self.text += text
 
 
 class _Channel(object):
+    """Acquires and pre-processes measurement data."""
 
     def Enable(self, a=None, test=True):
+        """Determines the state of the data acquisition facility. If True, the element will produce a data stream
+        whenever it gets triggered.
+
+        Warnings
+        --------
+        This parameter must not be changed if the channel is currently active, i.e. produces data
+        """
         p = 'boolean'
         a = _process(p, [self, _inspect.stack()[0][3]], a, test)
         return a
 
 
 class _Clock(object):
-
+    """Generates a continuous clock signal at a variable frequency, for use as a trigger source for data acquisition.
+     Data cannot be streamed live, only sent in selected buffer chunks."""
     def __init__(self, period):
         self.period = period
 
@@ -59,7 +66,7 @@ class _Clock(object):
 
 
 class _Experiment(object):
-
+    """Core features of the experiment. Can read/change the state of the experiment."""
     def Bricklet_Ready(self, test=''):
         p = 'string'
         a = _process(p, [self, _inspect.stack()[0][3]], None, test)
@@ -120,7 +127,7 @@ class _Experiment(object):
 
 
 class _GapVoltageControl(object):
-
+    """Control the gap voltage between the STM probe and the sample."""
     def Preamp_Range(self, a=None, test=0):
         p = 'enum'
         a = _process(p, [self, _inspect.stack()[0][3]], a, test)
@@ -134,7 +141,7 @@ class _GapVoltageControl(object):
 
 
 class _PiezoControl(object):
-
+    """Controls tip approach."""
     def Approach(self, a=None, test=0):
         p = 'unsigned_integer'
         is_parameter_allowable(a, self.__class__.__name__, _inspect.stack()[0][3], test)
@@ -193,7 +200,7 @@ class _PiezoControl(object):
 
 
 class _Regulator(object):
-
+    """Controls the Z position of the probe."""
     def Enable_Z_Offset_Slew_Rate(self, a=None, test=False):
         p = 'boolean'
         a = _process(p, [self, _inspect.stack()[0][3]], a, test)
@@ -259,7 +266,8 @@ class _Regulator(object):
 
 
 class _View(object):
-
+    """Allows for the delivery of data. Open the channel with IO.py, set Deliver_Data to True and return data
+    with Data() and a callback if desired."""
     def Cycle_Count(self, test=0):
         p = 'unsigned_integer'
         a = _process(p, [self, _inspect.stack()[0][3]], None, test)
@@ -298,7 +306,7 @@ class _View(object):
 
 
 class _XYScanner(object):
-
+    """Controls the image generation of the scan"""
     def Angle(self, a=None, test=0):
         p = 'integer'
         is_parameter_allowable(a, self.__class__.__name__, _inspect.stack()[0][3], test)
@@ -317,6 +325,7 @@ class _XYScanner(object):
         return a
 
     def Execute_Port_Colour(self, a=None, test=0):
+        """Here be dragons."""
         p = 'string'
         a = _process(p, [self, _inspect.stack()[0][3]], a, test)
         return a
@@ -454,7 +463,7 @@ class _XYScanner(object):
 
 
 class _Spectroscopy:
-
+    """Controls spectroscopy. Device 1&2 are the first two channels in the Matrix window."""
     def Enable_Feedback_Loop(self, a=None, test=False):
         p = 'boolean'
         a = _process(p, [self, _inspect.stack()[0][3]], a, test)
@@ -558,6 +567,7 @@ class _Spectroscopy:
 
 
 def read_min_max(module, parameter, test=0):
+    """Reads the minimum and maximum allowed values for settable parameters."""
     p = 'function'
     module = utils._friendly_name_to_mate(module)
     members = inspect.getmembers(sys.modules[__name__], inspect.isclass)
@@ -707,6 +717,7 @@ def _exit_handler():
 
 
 def wait_for_event():
+    print("Waiting...")
     log.AppendText('Waiting for event...\n')
     while _no_event():
         _time.sleep(0.05)

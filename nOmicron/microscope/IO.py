@@ -1,17 +1,27 @@
-import warnings
-import numpy as np
-
-from nOmicron.utils import utils
 import nOmicron.mate.objects as mo
+from nOmicron.utils import utils
 
 
 def connect():
+    """Connect to the Matrix. Matrix must be open and initalised."""
+
+    print("Connecting to the Matrix...")
     mo.mate.testmode = False
     mo.mate.connect()
     utils.is_online()
+    print("Connected Successfully!")
 
 
 def enable_channel(channel_name):
+    """Enables a channel for measurement.
+
+    Examples
+    --------
+    >>> from nOmicron.microscope import IO
+    >>> IO.connect()
+    >>> IO.enable_channel("I_t")
+    """
+
     utils.is_channel_real(channel_name)
 
     if len(channel_name) != 1 and channel_name[-1] != "t":
@@ -25,6 +35,7 @@ def enable_channel(channel_name):
 
 
 def disable_channel():
+    """Disables a channel from passing data."""
     if mo.channel_name == '':
         raise IOError("No channel to disable")
 
@@ -33,6 +44,24 @@ def disable_channel():
 
 
 def set_clock(sample_time, sample_points):
+    """Sets up the clock.
+
+    Parameters
+    ----------
+    sample_time : float
+    sample_points : int
+
+    Warnings
+    --------
+    Only enable this with data channels with a Clock (i.e. only continuous channels like I_t, df_t)
+
+    Examples
+    --------
+    >>> from nOmicron.microscope import IO
+    >>> IO.connect()
+    >>> IO.enable_channel("Z_t")
+    >>> IO.set_clock(1e-2, 200)  # 100 milliseconds, 200 points will be acquired on next trigger
+    """
     if "Clock" not in mo.mate.deployment_parameter(mo.mate.scope, mo.channel_name, 'Trigger'):
         raise IOError("Attempted to set a clock for a non-clock object")
 

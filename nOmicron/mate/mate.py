@@ -270,7 +270,6 @@ class MATE(object):
             for parameter in list(self.exp_params.keys()):
                 if not self.testmode:
                     prop = self.scope + '.' + parameter
-                    print(prop)
                     func_params = ['', 'getString', prop]
                     value, rc = self.remote_access(func_params, rc)
                     self.exp_params[parameter] = value
