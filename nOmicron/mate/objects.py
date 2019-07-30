@@ -1,14 +1,17 @@
 #   Code up to mate4dummies 0.4.2 (at time of branch) is Copyright © 2015 - 2018 Stephan Zevenhuizen
-#   MATE Objects, (10-05-2018).
+#   MATE, (20-08-2018).
 
 import ctypes as _ctypes
+import inspect
 import inspect as _inspect
+import sys
 import time as _time
 from msvcrt import getch, kbhit
 from random import random
 
-from nOmicron.mate import MATE as _MATE
+from nOmicron.utils import utils
 from nOmicron.utils.utils import is_parameter_allowable
+from .mate import MATE as _MATE
 
 
 class _Text(object):
@@ -451,6 +454,7 @@ class _XYScanner(object):
 
 
 class _Spectroscopy:
+
     def Enable_Feedback_Loop(self, a=None, test=False):
         p = 'boolean'
         a = _process(p, [self, _inspect.stack()[0][3]], a, test)
@@ -553,9 +557,23 @@ class _Spectroscopy:
         return a
 
 
-def _check_rc():
-    if mate.online and not mate.testmode:
-        mate.exit_handler(mate.rc)
+def read_min_max(module, parameter, test=0):
+    p = 'function'
+    module = utils._friendly_name_to_mate(module)
+    members = inspect.getmembers(sys.modules[__name__], inspect.isclass)
+    inspected = [item[1] for item in members if item[0] == module][0]
+
+    def get_value(min_max):
+        if module == "_Clock":
+            out = _process(p, [inspected(1.0), min_max], parameter, test)
+        else:
+            out = _process(p, [inspected(), min_max], parameter, test)
+        if type(out) is tuple:
+            out = out[0]
+        return out
+
+    outs = [get_value("min"), get_value("max")]
+    return outs
 
 
 def _process(p, caller, a, *args, **kwargs):
@@ -678,6 +696,10 @@ def _no_event():
     if kbhit():
         esc = ord(getch()) == 27
     return no_event and not esc
+
+def _check_rc():
+    if mate.online and not mate.testmode:
+        mate.exit_handler(mate.rc)
 
 
 def _exit_handler():

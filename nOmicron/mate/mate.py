@@ -11,6 +11,7 @@ import xml.etree.ElementTree as ET
 import pefile
 import psutil
 
+
 class MATE(object):
     class ValueType:
         vt_INTEGER = 1
