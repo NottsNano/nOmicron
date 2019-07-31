@@ -289,7 +289,6 @@ class MATE(object):
         ps = psutil.process_iter()
         p = next(ps)
         go = True
-        attempts = 0
         while go and not ok:
             try:
                 p_path = p.exe()
