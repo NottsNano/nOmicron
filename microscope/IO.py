@@ -1,5 +1,5 @@
-import nOmicron.mate.objects as mo
-from nOmicron.utils import utils
+import mate.objects as mo
+from utils import utils
 
 
 def connect():

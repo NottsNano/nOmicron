@@ -291,11 +291,6 @@ class MATE(object):
         go = True
         attempts = 0
         while go and not ok:
-            print(attempts)
-            attempts += 1
-            if attempts >= 100000:
-                raise ConnectionError("Matrix Connection Timeout. Try restarting Matrix and Control Unit.")
-
             try:
                 p_path = p.exe()
                 p_name = p.name()

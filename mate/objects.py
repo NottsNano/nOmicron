@@ -9,8 +9,8 @@ import time as _time
 from msvcrt import getch, kbhit
 from random import random
 
-from nOmicron.utils import utils
-from nOmicron.utils.utils import is_parameter_allowable
+from utils import utils
+from utils.utils import is_parameter_allowable
 from .mate import MATE as _MATE
 
 

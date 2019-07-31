@@ -1,7 +1,7 @@
 import ctypes
-import nOmicron.mate.objects as mo
+import mate.objects as mo
 
-from nOmicron.microscope import IO
+from microscope import IO
 
 
 def view_channel_properties(channel_name):

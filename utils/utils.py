@@ -6,7 +6,7 @@ import inspect
 import sys
 import warnings
 
-import nOmicron.mate.objects as mo
+import mate.objects as mo
 
 
 def is_online():

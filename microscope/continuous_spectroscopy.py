@@ -1,7 +1,7 @@
 import numpy as np
 
-import nOmicron.mate.objects as mo
-from nOmicron.microscope import IO
+import mate.objects as mo
+from microscope import IO
 
 
 def get_continuous_signal(channel_name, sample_time, sample_points):

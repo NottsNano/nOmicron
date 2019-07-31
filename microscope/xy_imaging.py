@@ -1,6 +1,6 @@
-import nOmicron.mate.objects as mo
+import mate.objects as mo
 import numpy as np
-from nOmicron.microscope import IO
+from microscope import IO
 def get_scan(channel_name, direction, num_lines):
     global retraces
     retraces = 0
