@@ -55,7 +55,6 @@ def check_response_code(string_to_check, object_type):
     bt.extend(string_to_check.encode())
     string_to_check = bytes(bt)
 
-    IO.connect()
     lib_mate = mo.mate.lib_mate
     b = ctypes.c_char()
     i = ctypes.c_int()
