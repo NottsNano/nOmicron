@@ -1,8 +1,10 @@
+# Oliver Gordon, 2019
+
 import numpy as np
 
 import mate.objects as mo
 from microscope import IO
-
+from tqdm import tqdm
 
 def get_continuous_signal(channel_name, sample_time, sample_points):
     """Acquire a continuous signal.
@@ -24,7 +26,7 @@ def get_continuous_signal(channel_name, sample_time, sample_points):
     Examples
     --------
     Acquire 60 points of I(t) data over 0.1 seconds
-    >>> from nOmicron.microscope import IO
+    >>> from microscope import IO
     >>> IO.connect()
     >>> t, I = get_continuous_signal("I_t", 1e-1, 60)
     >>> IO.disconnect()
@@ -43,6 +45,7 @@ def get_continuous_signal(channel_name, sample_time, sample_points):
     def view_continuous_callback():
         global view_count, x_data, y_data
         view_count += 1
+        pbar.update(1)
 
         data_size = mo.view.Data_Size()
         period = mo.clock.Period()
@@ -55,6 +58,7 @@ def get_continuous_signal(channel_name, sample_time, sample_points):
     mo.view.Data(view_continuous_callback)
     mo.allocate_sample_memory(sample_points)
 
+    pbar = tqdm(total=1)
     while view_count < 1 and mo.mate.rc == mo.mate.rcs['RMT_SUCCESS']:
         mo.wait_for_event()
     mo.clock.Enable(False)
@@ -117,6 +121,7 @@ def get_point_spectra(channel_name, target_position, start_end, sample_time, sam
 
     def view_spectroscopy_callback():
         global view_count, x_data, y_data
+        pbar.update(1)
         view_count += 1
         cycle_count = mo.view.Cycle_Count() - 1
         packet_count = mo.view.Packet_Count() - 1
@@ -145,6 +150,8 @@ def get_point_spectra(channel_name, target_position, start_end, sample_time, sam
     mo.xy_scanner.move()
     mo.view.Data(view_spectroscopy_callback)
     mo.allocate_sample_memory(sample_points)
+
+    pbar = tqdm(total=max_count)
     while view_count < max_count and mo.mate.rc == mo.mate.rcs['RMT_SUCCESS']:
         mo.wait_for_event()
     mo.view.Data()

@@ -1,3 +1,5 @@
+# Oliver Gordon, 2019
+
 import ctypes
 import mate.objects as mo
 

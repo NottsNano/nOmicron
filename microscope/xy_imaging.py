@@ -1,77 +1,56 @@
+# Oliver Gordon, 2019
+
+import warnings
+
 import mate.objects as mo
 import numpy as np
 from microscope import IO
+from tqdm import tqdm
 
+def set_scan_position(xy_pos, width_height, angle):
+    if width_height[0] != width_height[1]:
+        mo.xy_scanner.Width_Height_Constrained(False)
+    mo.xy_scanner.W
 
-# def scan_constraint
-
-# def get_scan(channel_name, direction, num_lines):
-#     global retraces, linescan
-#     retraces = 0
-#     linescan = None
-#     dir_dict = {"up": "Fw",
-#                 "down": "Bw"}
-#
-#     def view_xy_callback():
-#         global retraces, linescan
-#         retraces += 1
-#         print(mo.view.Data_Size())
-#         data_size = mo.view.Data_Size()
-#         print(mo.view.Data())
-#         print(mo.view.Run_Count(), mo.view.Cycle_Count(), mo.view.Packet_Count())
-#         linescan = np.array(mo.sample_data(data_size))
-#         mo.xy_scanner.resume()
-#
-#     IO.enable_channel(f"{channel_name}_{dir_dict[direction]}")
-#     mo.xy_scanner.X_Retrace(False)
-#     reset_value = mo.xy_scanner.X_Trace_Trigger()
-#     mo.xy_scanner.X_Trace_Trigger(True)
-#     mo.xy_scanner.X_Trace_Done(view_xy_callback)
-#     mo.experiment.start()
-#     mo.allocate_sample_memory(20)
-#     while retraces < num_lines+1 and mo.mate.rc == mo.mate.rcs['RMT_SUCCESS']:
-#         mo.wait_for_event()
-#     mo.view.Data()
-#
-#     mo.experiment.stop()
-#     mo.xy_scanner.X_Trace_Trigger()
-#     mo.xy_scanner.X_Trace_Trigger(reset_value)
-#     IO.disable_channel()
-
-def try_again(channel_name, direction, num_lines):
-    global retraces, linescan
-    retraces = 0
-    linescan = None
+def get_xy_scan(channel_name, direction, num_lines):
+    global line_count, xydata
+    line_count = 0
+    xydata = np.zeros((mo.xy_scanner.Points(), mo.xy_scanner.Lines()))
+    xydata[:] = np.nan
     dir_dict = {"up": "Fw",
                 "down": "Bw"}
 
-    #
     def view_xy_callback():
-        global retraces, linescan
-        retraces += 1
-        #mo.experiment.pause()
+        global line_count, xydata
+        if mo.view.Packet_Count() != line_count:
+            warnings.warn("Not all lines delivered in time (?). Is the scan speed too fast?")
+
         data_size = mo.view.Data_Size()
-        # print(mo.view.Data())
-        print(mo.view.Run_Count(), mo.view.Cycle_Count(), mo.view.Packet_Count())
-        linescan = np.array(mo.sample_data(data_size))
-        print(linescan)
+        xydata[line_count, :] = np.array(mo.sample_data(data_size))
+
+        line_count += 1
+        pbar.update(1)
+
         mo.xy_scanner.resume()
 
     IO.enable_channel(f"{channel_name}_{dir_dict[direction]}")
     mo.xy_scanner.X_Retrace(False)
     mo.xy_scanner.X_Trace_Trigger(True)
     mo.view.Data(view_xy_callback)
-    mo.allocate_sample_memory(num_lines)
-    #mo.experiment.restart()
+    mo.allocate_sample_memory(mo.xy_scanner.Points())
+    mo.experiment.start()
 
-    while retraces < 10 and mo.mate.rc == mo.mate.rcs['RMT_SUCCESS']:
+    pbar = tqdm(total=num_lines)
+    while line_count < num_lines and mo.mate.rc == mo.mate.rcs['RMT_SUCCESS']:
         mo.wait_for_event()
-    mo.view.Data()
 
-    #mo.experiment.stop()
-    #IO.disable_channel()
+    mo.experiment.stop()
+    IO.disable_channel()
 
+    return xydata
 
 if __name__ == "__main__":
     IO.connect()
-    try_again("Z", "up", 20)
+    mo.xy_scanner.Points(300)
+    mo.xy_scanner.Lines(300)
+    get_xy_scan("Z", "up", 30)

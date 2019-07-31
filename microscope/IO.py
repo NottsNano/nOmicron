@@ -1,3 +1,5 @@
+# Oliver Gordon, 2019
+
 import mate.objects as mo
 from utils import utils
 
@@ -43,6 +45,7 @@ def enable_channel(channel_name):
         mo.get_clock_name(mo.channel_name)
 
     mo.view.Deliver_Data(True)
+
 
 def disable_channel():
     """Disables a channel from passing data."""

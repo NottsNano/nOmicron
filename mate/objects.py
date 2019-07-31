@@ -1,5 +1,6 @@
 #   Code up to mate4dummies 0.4.2 (at time of branch) is Copyright © 2015 - 2018 Stephan Zevenhuizen
 #   MATE, (20-08-2018).
+#   Additional changes by Oliver Gordon, 2019
 
 import ctypes as _ctypes
 import inspect
@@ -269,6 +270,10 @@ class _Regulator(object):
         a = _process(p, [self, _inspect.stack()[0][3]], None, test)
         return a
 
+    def Setpoint_Detected(self, a=None, test=False):
+        p = 'boolean'
+        a = _process(p, [self, _inspect.stack()[0][3]], a, test)
+        return a
 
 class _View(object):
     """Allows for the delivery of data. Open the channel with IO.py, set Deliver_Data to True and return data
@@ -793,7 +798,7 @@ def _exit_handler():
 
 
 def wait_for_event():
-    print("Waiting...")
+    #print("Waiting...")
     log.AppendText('Waiting for event...\n')
     while _no_event():
         _time.sleep(0.05)

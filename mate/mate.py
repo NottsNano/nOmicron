@@ -1,6 +1,6 @@
 #   Code up to mate4dummies 0.4.2 (at time of branch) is Copyright © 2015 - 2018 Stephan Zevenhuizen
 #   MATE, (20-08-2018).
-
+#   Additional changes by Oliver Gordon, 2019
 import ctypes
 import os
 import re

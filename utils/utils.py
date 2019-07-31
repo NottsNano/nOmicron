@@ -1,3 +1,5 @@
+# Oliver Gordon, 2019
+
 import inspect
 import json
 import sys
