@@ -1,5 +1,5 @@
-import nOmicron.mate.objects as mo
-from nOmicron.utils import utils
+import mate.objects as mo
+from utils import utils
 from wrapt_timeout_decorator import *
 
 @timeout(10, exception_message="Timed out while trying to connect. Try restarting Matrix/CU")

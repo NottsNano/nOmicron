@@ -1,6 +1,6 @@
-import nOmicron.mate.objects as mo
+import mate.objects as mo
 import numpy as np
-from nOmicron.microscope import IO
+from microscope import IO
 
 # def scan_constraint
 
