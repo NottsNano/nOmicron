@@ -274,11 +274,6 @@ class _View(object):
     """Allows for the delivery of data. Open the channel with IO.py, set Deliver_Data to True and return data
     with Data() and a callback if desired."""
 
-    def Cycle_Count(self, test=0):
-        p = 'unsigned_integer'
-        a = _process(p, [self, _inspect.stack()[0][3]], None, test)
-        return a
-
     def Data(self, f=None, *args, **kwargs):
         p = 'set_observed'
         out = _process(p, [self, _inspect.stack()[0][3]], f, *args, **kwargs)
@@ -312,22 +307,19 @@ class _View(object):
 
 
 class _XYScanner(object):
-    """Controls the image generation of the scan"""
+    """Controls general scan parameters, tip relocation, and triggering of functions after tip relocation"""
 
     def Angle(self, a=None, test=0):
+        """Integer describing angle of scan"""
         p = 'integer'
         is_parameter_allowable(a, self.__class__.__name__, _inspect.stack()[0][3], test)
         a = _process(p, [self, _inspect.stack()[0][3]], a, test)
         return a
 
     def Area(self, a=None, test=[0.0, 0.0]):
+        """Scan area in metres"""
         p = 'pair'
         is_parameter_allowable(a, self.__class__.__name__, _inspect.stack()[0][3], test)
-        a = _process(p, [self, _inspect.stack()[0][3]], a, test)
-        return a
-
-    def Enable_Drift_Compensation(self, a=None, test=False):
-        p = 'boolean'
         a = _process(p, [self, _inspect.stack()[0][3]], a, test)
         return a
 
@@ -337,59 +329,104 @@ class _XYScanner(object):
         a = _process(p, [self, _inspect.stack()[0][3]], a, test)
         return a
 
+    def Points(self, a=None, test=0):
+        """Integer number of points to scan with. Fixed to Lines unless Points_Lines_Constrained = False"""
+        p = 'unsigned_integer'
+        is_parameter_allowable(a, self.__class__.__name__, _inspect.stack()[0][3], test)
+        a = _process(p, [self, _inspect.stack()[0][3]], a, test)
+        return a
+
     def Lines(self, a=None, test=0):
+        """Integer number of lines to scan per image. Fixed to Points unless Points_Lines_Constrained = False"""
         p = 'unsigned_integer'
         is_parameter_allowable(a, self.__class__.__name__, _inspect.stack()[0][3], test)
         a = _process(p, [self, _inspect.stack()[0][3]], a, test)
         return a
 
     def Offset(self, a=None, test=[0.0, 0.0]):
+        """Scan-sample offset, in metres. Identical to setting X_Offset and Y_Offset separately."""
         p = 'pair'
         is_parameter_allowable(a, self.__class__.__name__, _inspect.stack()[0][3], test)
         a = _process(p, [self, _inspect.stack()[0][3]], a, test)
         return a
 
+    def Enable_Drift_Compensation(self, a=None, test=False):
+        """Boolean to enable drift compensation."""
+        p = 'boolean'
+        a = _process(p, [self, _inspect.stack()[0][3]], a, test)
+        return a
+
+    def Enable_Plane_Slope(self, a=None, test=False):
+        """Boolean for sample tilt correction. See also Plane_X_Slope, Plane_Y_Slope and Detect_Slope."""
+        p = 'boolean'
+        a = _process(p, [self, _inspect.stack()[0][3]], a, test)
+        return a
+
     def Plane_X_Slope(self, a=None, test=0.0):
+        """Sample slope in X direction. Percentage in range(-100, 100)"""
         p = 'double'
         is_parameter_allowable(a, self.__class__.__name__, _inspect.stack()[0][3], test)
         a = _process(p, [self, _inspect.stack()[0][3]], a, test)
         return a
 
     def Plane_Y_Slope(self, a=None, test=0.0):
+        """Sample slope in Y direction. Percentage in range(-100, 100)"""
         p = 'double'
         is_parameter_allowable(a, self.__class__.__name__, _inspect.stack()[0][3], test)
         a = _process(p, [self, _inspect.stack()[0][3]], a, test)
         return a
 
-    def Points(self, a=None, test=0):
-        p = 'unsigned_integer'
-        is_parameter_allowable(a, self.__class__.__name__, _inspect.stack()[0][3], test)
-        a = _process(p, [self, _inspect.stack()[0][3]], a, test)
-        return a
-
     def Raster_Time(self, a=None, test=0.0):
+        """Time in seconds to move between scanning points. Identical to XYScanner.Move_Raster_Time. Real value is
+        shown with Scan_Speed"""
         p = 'double'
         is_parameter_allowable(a, self.__class__.__name__, _inspect.stack()[0][3], test)
         a = _process(p, [self, _inspect.stack()[0][3]], a, test)
         return a
 
     def Return_To_Stored_Position(self, a=None, test=False):
+        """Set to True to return the probe to the position set by XYScanner.Store_Current_Position"""
         p = 'boolean'
         a = _process(p, [self, _inspect.stack()[0][3]], a, test)
         return a
 
     def Store_Current_Position(self, a=None, test=False):
+        """Set to True to store the current scan position in hardware, to later recall with
+        XYScanner.Return_To_Stored_Position"""
         p = 'boolean'
         a = _process(p, [self, _inspect.stack()[0][3]], a, test)
         return a
 
     def Target_Position(self, a=None, test=[0.0, 0.0]):
+        """Target position for tip within scanning window. NOT in metres, but co-ordinates in range (-1, 1)"""
         p = 'pair'
         a = _process(p, [self, _inspect.stack()[0][3]], a, test)
         return a
 
     def Trigger_Execute_At_Target_Position(self, a=None, test=False):
+        """Boolean of if some function (e.g. spectroscopy) should be executed when the tip reaches the position
+        described by XYScanner.Target_Position([x, y]), and beginning the movement with XYScanner.move()"""
         p = 'boolean'
+        a = _process(p, [self, _inspect.stack()[0][3]], a, test)
+        return a
+
+    def Width_Height_Constrained(self, a=None, test=False):
+        """Boolean of if scan width and height should be locked together"""
+        p = 'boolean'
+        a = _process(p, [self, _inspect.stack()[0][3]], a, test)
+        return a
+
+    def Width(self, a=None, test=0.0):
+        """Scan width in metres"""
+        p = 'double'
+        is_parameter_allowable(a, self.__class__.__name__, _inspect.stack()[0][3], test)
+        a = _process(p, [self, _inspect.stack()[0][3]], a, test)
+        return a
+
+    def Height(self, a=None, test=0.0):
+        """Scan height in metres"""
+        p = 'double'
+        is_parameter_allowable(a, self.__class__.__name__, _inspect.stack()[0][3], test)
         a = _process(p, [self, _inspect.stack()[0][3]], a, test)
         return a
 
@@ -434,145 +471,175 @@ class _XYScanner(object):
         return a
 
     def Y_Retrace(self, a=None, test=False):
+        """If we should trigger and do something (e.g. acquire data) after a complete upwards (False) or upwards AND
+        downwards (True) scan"""
         p = 'boolean'
         a = _process(p, [self, _inspect.stack()[0][3]], a, test)
         return a
 
     def Y_Retrace_Done(self, f=None, *args, **kwargs):
+        """Allows us to call a callback (e.g. for data acquisition) after completing an entire forward AND backward
+        scan. Y_Retrace_Trigger must first be set to True."""
         p = 'set_observed'
         out = _process(p, [self, _inspect.stack()[0][3]], f, *args, **kwargs)
 
     def Y_Retrace_Trigger(self, a=None, test=False):
+        """If we want to trigger and do something (e.g. acquire data) after completing an entire
+        forward AND backward scan"""
         p = 'boolean'
         a = _process(p, [self, _inspect.stack()[0][3]], a, test)
         return a
 
     def Y_Trace_Done(self, f=None, *args, **kwargs):
+        """Allows us to call a callback (e.g. for data acquisition) after completing an entire forward scan.
+        Y_Trace_Trigger must first be set to True."""
         p = 'set_observed'
         out = _process(p, [self, _inspect.stack()[0][3]], f, *args, **kwargs)
 
     def Y_Trace_Trigger(self, a=None, test=False):
+        """If we want to trigger and do something (e.g. acquire data) after completing an entire forward scan"""
         p = 'boolean'
         a = _process(p, [self, _inspect.stack()[0][3]], a, test)
         return a
 
     def move(self):
+        """Move the tip to the position set with Target_Position"""
         p = 'function'
         out = _process(p, [self, _inspect.stack()[0][3]], None)
 
     def resume(self):
+        """Resume the imaging scan"""
         p = 'function'
         out = _process(p, [self, _inspect.stack()[0][3]], None)
 
     def execute(self):
+        """Super powerful. Do something, then run the trigger function on completion"""
         p = 'function'
         out = _process(p, [self, _inspect.stack()[0][3]], None)
 
 
 class _Spectroscopy:
-    """Controls spectroscopy. Device 1&2 are the first two channels in the Matrix window."""
+    """Controls spectroscopy. Device 1&2 are the first two channels in the Matrix window (?)."""
 
     def Enable_Feedback_Loop(self, a=None, test=False):
+        """Enable the feedback loop"""
         p = 'boolean'
         a = _process(p, [self, _inspect.stack()[0][3]], a, test)
         return a
 
     def Disable_Feedback_Loop(self, a=None, test=False):
+        """Disable the feedback loop"""
         p = 'boolean'
         a = _process(p, [self, _inspect.stack()[0][3]], a, test)
         return a
 
     def Spectroscopy_Mode(self, a=None, test=0):
+        """Pick the channel to perform the spectroscopy on when calling Spectroscopy.execute().
+         0->channel 1, 1->channel 2, 2->dragons"""
         p = 'enum'
         a = _process(p, [self, _inspect.stack()[0][3]], a, test)
         return a
 
     def execute(self):
+        """Execute spectroscopy"""
         p = 'function'
         out = _process(p, [self, _inspect.stack()[0][3]], None)
 
     def Device_1_Repetitions(self, a=None, test=0):
+        """Integer describing number of repeats of spectra on channel 1"""
         p = 'unsigned_integer'
         is_parameter_allowable(a, self.__class__.__name__, _inspect.stack()[0][3], test)
         a = _process(p, [self, _inspect.stack()[0][3]], a, test)
         return a
 
     def Device_1_Start(self, a=None, test=0.0):
+        """Spectroscopy start value on channel 1"""
         p = 'double'
         is_parameter_allowable(a, self.__class__.__name__, _inspect.stack()[0][3], test)
         a = _process(p, [self, _inspect.stack()[0][3]], a, test)
         return a
 
     def Device_1_End(self, a=None, test=0.0):
+        """Spectroscopy end value on channel 1"""
         p = 'double'
         is_parameter_allowable(a, self.__class__.__name__, _inspect.stack()[0][3], test)
         a = _process(p, [self, _inspect.stack()[0][3]], a, test)
         return a
 
     def Device_1_Points(self, a=None, test=0):
+        """Spectroscopy points on channel 1"""
         p = 'unsigned_integer'
         is_parameter_allowable(a, self.__class__.__name__, _inspect.stack()[0][3], test)
         a = _process(p, [self, _inspect.stack()[0][3]], a, test)
         return a
 
     def Raster_Time_1(self, a=None, test=0):
+        """Time in seconds to acquire data at each spectroscopy step on channel 1."""
         p = 'double'
         is_parameter_allowable(a, self.__class__.__name__, _inspect.stack()[0][3], test)
         a = _process(p, [self, _inspect.stack()[0][3]], a, test)
         return a
 
     def Device_1_Offset_Delay(self, a=None, test=0.0):
+        """Offset time"""
         p = 'double'
         is_parameter_allowable(a, self.__class__.__name__, _inspect.stack()[0][3], test)
         a = _process(p, [self, _inspect.stack()[0][3]], a, test)
         return a
 
     def Enable_Device_1_Ramp_Reversal(self, a=None, test=True):
+        """More dragons."""
         p = 'boolean'
         a = _process(p, [self, _inspect.stack()[0][3]], a, test)
         return a
 
     def Device_2_Repetitions(self, a=None, test=0):
+        """Integer describing number of repeats of spectra on channel 2"""
         p = 'unsigned_integer'
         is_parameter_allowable(a, self.__class__.__name__, _inspect.stack()[0][3], test)
         a = _process(p, [self, _inspect.stack()[0][3]], a, test)
         return a
 
     def Device_2_Start(self, a=None, test=0.0):
+        """Spectroscopy start value on channel 2"""
         p = 'double'
         is_parameter_allowable(a, self.__class__.__name__, _inspect.stack()[0][3], test)
         a = _process(p, [self, _inspect.stack()[0][3]], a, test)
         return a
 
     def Device_2_End(self, a=None, test=0.0):
+        """Spectroscopy end value on channel 2"""
         p = 'double'
         is_parameter_allowable(a, self.__class__.__name__, _inspect.stack()[0][3], test)
         a = _process(p, [self, _inspect.stack()[0][3]], a, test)
         return a
 
     def Device_2_Points(self, a=None, test=0):
+        """Spectroscopy points on channel 2"""
         p = 'unsigned_integer'
         is_parameter_allowable(a, self.__class__.__name__, _inspect.stack()[0][3], test)
         a = _process(p, [self, _inspect.stack()[0][3]], a, test)
         return a
 
     def Raster_Time_2(self, a=None, test=0):
+        """Time in seconds to acquire data at each spectroscopy step on channel 2."""
         p = 'double'
         is_parameter_allowable(a, self.__class__.__name__, _inspect.stack()[0][3], test)
         a = _process(p, [self, _inspect.stack()[0][3]], a, test)
         return a
 
     def Device_2_Offset_Delay(self, a=None, test=0.0):
+        """Offset time"""
         p = 'double'
         is_parameter_allowable(a, self.__class__.__name__, _inspect.stack()[0][3], test)
         a = _process(p, [self, _inspect.stack()[0][3]], a, test)
         return a
 
     def Enable_Device_2_Ramp_Reversal(self, a=None, test=True):
+        """More dragons."""
         p = 'boolean'
         a = _process(p, [self, _inspect.stack()[0][3]], a, test)
         return a
-
 
 def read_min_max(module, parameter, test=0):
     """Reads the minimum and maximum allowed values for settable parameters."""
