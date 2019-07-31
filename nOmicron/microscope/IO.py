@@ -1,7 +1,8 @@
 import nOmicron.mate.objects as mo
 from nOmicron.utils import utils
+from wrapt_timeout_decorator import *
 
-
+@timeout(10, exception_message="Timed out while trying to connect. Try restarting Matrix/CU")
 def connect():
     """Connect to the Matrix. Matrix must be open and initalised."""
 
@@ -30,13 +31,14 @@ def enable_channel(channel_name):
     >>> IO.enable_channel("I_t")
     """
 
-    utils.is_channel_real(channel_name)
+    if channel_name[-1] == "w":
+        utils.is_channel_real(channel_name[:-3])
+    else:
+        utils.is_channel_real(channel_name)
 
-    if mo.channel_name != '':
-        disable_channel()
-
-    if len(channel_name) != 1 and channel_name[-1] != "t":
+    if len(channel_name) != 1 and channel_name[-1] != "t" and channel_name[-1] != "w":
         channel_name += "_Spec"
+
     mo.channel_name = channel_name
 
     if channel_name[-1] == "t":
