@@ -30,7 +30,7 @@ def get_continuous_signal(channel_name, sample_time, sample_points):
     >>> IO.disconnect()
 
     Acquire 100 points of Z(t) data over 5 seconds
-    >>> from nOmicron.microscope import IO
+    >>> from microscope import IO
     >>> IO.connect()
     >>> t, I = get_continuous_signal("Z_t", 5, 100)
     >>> IO.disconnect()
@@ -101,7 +101,7 @@ def get_point_spectra(channel_name, target_position, start_end, sample_time, sam
     Examples
     --------
     Acquire 60 points of I(V) data over 10 milliseconds, with tip placed in middle of scan window.
-    >>> from nOmicron.microscope import IO
+    >>> from microscope import IO
     >>> IO.connect()
     >>> v, I = get_point_spectra("I_V", start_end=[0, 1], target_position=[0, 0], ...
     >>>                   repeats=3, sample_points=50, sample_time=10e-3, forward_back=True)

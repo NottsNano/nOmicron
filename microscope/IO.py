@@ -22,28 +22,27 @@ def disconnect():
 
 def enable_channel(channel_name):
     """Enables a channel (e.g. Z_Fw, I_Bw, I_t, Aux1_t, I_V, I_Z) for measurement.
-
     Examples
     --------
-    >>> from nOmicron.microscope import IO
+    >>> from microscope import IO
     >>> IO.connect()
     >>> IO.enable_channel("I_t")
     """
 
-    utils.is_channel_real(channel_name)
+    if channel_name[-1] == "w":
+        utils.is_channel_real(channel_name[:-3])
+    else:
+        utils.is_channel_real(channel_name)
 
-    if mo.channel_name != '':
-        disable_channel()
-
-    if len(channel_name) != 1 and channel_name[-1] != "t":
+    if len(channel_name) != 1 and channel_name[-1] != "t" and channel_name[-1] != "w":
         channel_name += "_Spec"
+
     mo.channel_name = channel_name
 
     if channel_name[-1] == "t":
         mo.get_clock_name(mo.channel_name)
 
     mo.view.Deliver_Data(True)
-
 
 def disable_channel():
     """Disables a channel from passing data."""
@@ -68,7 +67,7 @@ def set_clock(sample_time, sample_points):
 
     Examples
     --------
-    >>> from nOmicron.microscope import IO
+    >>> from microscope import IO
     >>> IO.connect()
     >>> IO.enable_channel("Z_t")
     >>> IO.set_clock(1e-2, 200)  # 100 milliseconds, 200 points will be acquired on next trigger
