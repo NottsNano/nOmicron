@@ -3,14 +3,11 @@
 #   Additional changes by Oliver Gordon, 2019
 
 import ctypes as _ctypes
-import inspect
 import inspect as _inspect
-import sys
 import time as _time
 from msvcrt import getch, kbhit
 from random import random
 
-from utils import utils
 from utils.utils import is_parameter_allowable
 from .mate import MATE as _MATE
 
@@ -348,6 +345,12 @@ class _XYScanner(object):
         a = _process(p, [self, _inspect.stack()[0][3]], a, test)
         return a
 
+    def Points_Lines_Constrained(self, a=None, test=False):
+        """Boolean of if scan points and lines should be locked together"""
+        p = 'boolean'
+        a = _process(p, [self, _inspect.stack()[0][3]], a, test)
+        return a
+
     def Offset(self, a=None, test=[0.0, 0.0]):
         """Scan-sample offset, in metres. Identical to setting X_Offset and Y_Offset separately."""
         p = 'pair'
@@ -440,6 +443,12 @@ class _XYScanner(object):
         a = _process(p, [self, _inspect.stack()[0][3]], None, test)
         return a
 
+    def X_Offset(self, a=None, test=0.0):
+        p = 'double'
+        is_parameter_allowable(a, self.__class__.__name__, _inspect.stack()[0][3], test)
+        a = _process(p, [self, _inspect.stack()[0][3]], a, test)
+        return a
+
     def X_Drift(self, a=None, test=0.0):
         p = 'double'
         is_parameter_allowable(a, self.__class__.__name__, _inspect.stack()[0][3], test)
@@ -470,6 +479,12 @@ class _XYScanner(object):
         return a
 
     def Y_Drift(self, a=None, test=0.0):
+        p = 'double'
+        is_parameter_allowable(a, self.__class__.__name__, _inspect.stack()[0][3], test)
+        a = _process(p, [self, _inspect.stack()[0][3]], a, test)
+        return a
+
+    def Y_Offset(self, a=None, test=0.0):
         p = 'double'
         is_parameter_allowable(a, self.__class__.__name__, _inspect.stack()[0][3], test)
         a = _process(p, [self, _inspect.stack()[0][3]], a, test)
@@ -645,25 +660,6 @@ class _Spectroscopy:
         p = 'boolean'
         a = _process(p, [self, _inspect.stack()[0][3]], a, test)
         return a
-
-def read_min_max(module, parameter, test=0):
-    """Reads the minimum and maximum allowed values for settable parameters."""
-    p = 'function'
-    module = utils._friendly_name_to_mate(module)
-    members = inspect.getmembers(sys.modules[__name__], inspect.isclass)
-    inspected = [item[1] for item in members if item[0] == module][0]
-
-    def get_value(min_max):
-        if module == "_Clock":
-            out = _process(p, [inspected(1.0), min_max], parameter, test)
-        else:
-            out = _process(p, [inspected(), min_max], parameter, test)
-        if type(out) is tuple:
-            out = out[0]
-        return out
-
-    outs = [get_value("min"), get_value("max")]
-    return outs
 
 
 def _process(p, caller, a, *args, **kwargs):

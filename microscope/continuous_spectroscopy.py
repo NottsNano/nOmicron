@@ -79,7 +79,7 @@ def get_point_spectra(channel_name, target_position, start_end, sample_time, sam
     channel_name : str
         The channel to acquire from, e.g. I_V, Z_V, Aux2_V
     target_position : list
-        [x, y] in the range -1,1
+        [x, y] in the range -1,1. Can be converted from real nm units with utils.convert...
     start_end : tuple
         Start and end I/Z/Aux2
     sample_time : float
@@ -132,16 +132,15 @@ def get_point_spectra(channel_name, target_position, start_end, sample_time, sam
 
     # Set all the parameters
     IO.enable_channel(channel_name)
-    mo.spectroscopy.Spectroscopy_Mode(modes[channel_name[-1]])
-    getattr(mo.spectroscopy, f"Device_{modes[channel_name[-1]] + 1}_Points")(sample_points)
-    getattr(mo.spectroscopy, f"Raster_Time_{modes[channel_name[-1]] + 1}")(sample_time)
-    getattr(mo.spectroscopy, f"Device_{modes[channel_name[-1]] + 1}_Start")(start_end[0])
-    getattr(mo.spectroscopy, f"Device_{modes[channel_name[-1]] + 1}_End")(start_end[1])
-    getattr(mo.spectroscopy, f"Device_{modes[channel_name[-1]] + 1}_Repetitions")(repeats)
-    getattr(mo.spectroscopy, f"Enable_Device_{modes[channel_name[-1]] + 1}_Ramp_Reversal")(forward_back)
+    mo.spectroscopy.Spectroscopy_Mode(modes[channel_name[-2]])
+    getattr(mo.spectroscopy, f"Device_{modes[channel_name[-2]] + 1}_Points")(sample_points)
+    getattr(mo.spectroscopy, f"Raster_Time_{modes[channel_name[-2]] + 1}")(sample_time)
+    getattr(mo.spectroscopy, f"Device_{modes[channel_name[-2]] + 1}_Start")(start_end[0])
+    getattr(mo.spectroscopy, f"Device_{modes[channel_name[-2]] + 1}_End")(start_end[1])
+    getattr(mo.spectroscopy, f"Device_{modes[channel_name[-2]] + 1}_Repetitions")(repeats)
+    getattr(mo.spectroscopy, f"Enable_Device_{modes[channel_name[-2]] + 1}_Ramp_Reversal")(forward_back)
 
     # Set up spec
-    mo.xy_scanner.Store_Current_Position(False)
     mo.xy_scanner.Store_Current_Position(True)
     mo.xy_scanner.Target_Position(target_position)
     mo.xy_scanner.Trigger_Execute_At_Target_Position(True)
@@ -171,9 +170,9 @@ def get_point_spectra(channel_name, target_position, start_end, sample_time, sam
 
 if __name__ == '__main__':
     IO.connect()
-    t, I1 = get_continuous_signal("I_t", sample_time=1, sample_points=50)
+    # t, I1 = get_continuous_signal("I(t)", sample_time=2, sample_points=50)
 
     # Do a fixed point spec
-    v, I2 = get_point_spectra("I_V", start_end=[0, 1], target_position=[0, 0],
+    v, I2 = get_point_spectra("I(V)", start_end=(0, 1), target_position=[0, 0],
                               repeats=3, sample_points=50, sample_time=10e-3, forward_back=True)
-    IO.disconnect()
+    #IO.disconnect()

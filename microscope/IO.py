@@ -2,7 +2,7 @@
 
 import mate.objects as mo
 from utils import utils
-
+import re
 
 def connect():
     """Connect to the Matrix. Matrix must be open and initalised."""
@@ -31,6 +31,8 @@ def enable_channel(channel_name):
     >>> IO.enable_channel("I_t")
     """
 
+    channel_name = channel_name.replace("(", "_").replace(")","")
+
     if channel_name[-1] == "w":
         utils.is_channel_real(channel_name[:-3])
     else:
@@ -40,7 +42,6 @@ def enable_channel(channel_name):
         channel_name += "_Spec"
 
     mo.channel_name = channel_name
-
     if channel_name[-1] == "t":
         mo.get_clock_name(mo.channel_name)
 

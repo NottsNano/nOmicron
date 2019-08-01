@@ -77,7 +77,7 @@ def _friendly_name_to_mate(module_name):
 
 
 def is_parameter_allowable(a, module, parameter, test=0):
-    min_max = mo.read_min_max(module, parameter, test)
+    min_max = read_min_max(module, parameter, test)
 
     if a is not None:
         response = min_max[0] <= a <= min_max[1]
@@ -88,3 +88,21 @@ def is_parameter_allowable(a, module, parameter, test=0):
     return response
 
 
+def read_min_max(module, parameter, test=0):
+    """Reads the minimum and maximum allowed values for settable parameters."""
+    p = 'function'
+    module = _friendly_name_to_mate(module)
+    members = inspect.getmembers(sys.modules['mate.objects'], inspect.isclass)
+    inspected = [item[1] for item in members if item[0] == module][0]
+
+    def get_value(min_max):
+        if module == "_Clock":
+            out = mo._process(p, [inspected(1.0), min_max], parameter, test)
+        else:
+            out = mo._process(p, [inspected(), min_max], parameter, test)
+        if type(out) is tuple:
+            out = out[0]
+        return out
+
+    outs = [get_value("min"), get_value("max")]
+    return outs
