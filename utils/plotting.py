@@ -46,18 +46,17 @@ def plot_linear_signal(x, y, channel=None, title=None):
         fig, axes = plt.subplots(nrows=len(y), ncols=1, sharex=True, sharey=True)
         for repeat in range(len(y)):
             if isinstance(y[0], list):
-                axes[repeat].plot(x, y[repeat][0], 'g')
-                axes[repeat].plot(x, y[repeat][1], 'y')
+                axes[repeat].plot(x, y[repeat][0], 'green')
+                axes[repeat].plot(x, y[repeat][1], 'gold')
                 fig.legend(['Forward', 'Back'])
             else:
-                axes[repeat].plot(x, y[repeat], 'g')
-
+                axes[repeat].plot(x, y[repeat], 'green')
     else:
-        plt.plot(x, y, 'g')
+        plt.plot(x, y, 'green')
 
     if title is not None:
         plt.title(title)
 
     if channel is not None:
-        plt.xlabel(channel[-2])
+        plt.xlabel(channel[2])
         plt.ylabel(channel[0])

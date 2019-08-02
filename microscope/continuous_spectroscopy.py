@@ -117,7 +117,8 @@ def get_point_spectra(channel_name, target_position, start_end, sample_time, sam
     max_count = (repeats * (forward_back + 1))
     view_count = 0
     x_data = None
-    y_data = [[None] * (bool(forward_back) + 1)] * repeats
+    y_data = []
+    [y_data.append([None] * (bool(forward_back) + 1)) for i in range(repeats)]  # Can't use [] ** repeats
 
     def view_spectroscopy_callback():
         global view_count, x_data, y_data
@@ -125,10 +126,11 @@ def get_point_spectra(channel_name, target_position, start_end, sample_time, sam
         view_count += 1
         cycle_count = mo.view.Cycle_Count() - 1
         packet_count = mo.view.Packet_Count() - 1
-
         data_size = mo.view.Data_Size()
         x_data = np.linspace(start_end[0], start_end[1], data_size)
-        y_data[cycle_count][packet_count] = np.array(mo.sample_data(data_size))
+        y_data[cycle_count][packet_count] = np.array(mo.sample_data(data_size))*1e-9
+        if packet_count == 1:
+            y_data[cycle_count][packet_count] = np.flip(y_data[cycle_count][packet_count])
 
     # Set all the parameters
     IO.enable_channel(channel_name)
@@ -147,8 +149,8 @@ def get_point_spectra(channel_name, target_position, start_end, sample_time, sam
 
     # Do it
     mo.xy_scanner.move()
-    mo.view.Data(view_spectroscopy_callback)
     mo.allocate_sample_memory(sample_points)
+    mo.view.Data(view_spectroscopy_callback)
 
     pbar = tqdm(total=max_count)
     while view_count < max_count and mo.mate.rc == mo.mate.rcs['RMT_SUCCESS']:
@@ -169,10 +171,12 @@ def get_point_spectra(channel_name, target_position, start_end, sample_time, sam
 
 
 if __name__ == '__main__':
+    from utils.plotting import plot_linear_signal
     IO.connect()
     # t, I1 = get_continuous_signal("I(t)", sample_time=5, sample_points=50)
 
     # Do a fixed point spec
-    v, I2 = get_point_spectra("I(V)", start_end=(0, 1), target_position=[0, 0.5],
-                              repeats=3, sample_points=50, sample_time=10e-3, forward_back=True)
-    #IO.disconnect()
+    v, I2 = get_point_spectra("I(V)", start_end=(0.5, -0.5), target_position=[0, 0.5],
+                              repeats=4, sample_points=100, sample_time=20e-3, forward_back=True)
+    plot_linear_signal(v, I2, "I(V)")
+    IO.disconnect()
