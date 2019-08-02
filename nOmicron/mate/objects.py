@@ -8,7 +8,7 @@ import time as _time
 from msvcrt import getch, kbhit
 from random import random
 
-from utils.utils import is_parameter_allowable
+from nOmicron.utils.utils import is_parameter_allowable
 from .mate import MATE as _MATE
 
 

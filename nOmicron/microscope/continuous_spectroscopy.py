@@ -2,8 +2,8 @@
 
 import numpy as np
 
-import mate.objects as mo
-from microscope import IO
+import nOmicron.mate.objects as mo
+from nOmicron.microscope import IO
 from tqdm import tqdm
 
 def get_continuous_signal(channel_name, sample_time, sample_points):
@@ -26,16 +26,16 @@ def get_continuous_signal(channel_name, sample_time, sample_points):
     Examples
     --------
     Acquire 60 points of I(t) data over 0.1 seconds
-    >>> from microscope import IO
-    >>> from utils.plotting import plot_linear_signal
+    >>> from nOmicron.microscope import IO
+    >>> from nOmicron.utils.plotting import plot_linear_signal
     >>> IO.connect()
     >>> t, I = get_continuous_signal("I(t)", 1e-1, 60)
     >>> plot_linear_signal(v, I, "I(V)")
     >>> IO.disconnect()
 
     Acquire 100 points of Z(t) data over 5 seconds
-    >>> from microscope import IO
-    >>> from utils.plotting import plot_linear_signal
+    >>> from nOmicron.microscope import IO
+    >>> from nOmicron.utils.plotting import plot_linear_signal
     >>> IO.connect()
     >>> t, I = get_continuous_signal("Z(t)", 5, 100)
     >>> plot_linear_signal(v, I, "I(V)")
@@ -109,8 +109,8 @@ def get_point_spectra(channel_name, target_position, start_end, sample_time, sam
     Examples
     --------
     Acquire 60 points of I(V) data over 10 milliseconds, with tip placed in middle of scan window.
-    >>> from microscope import IO
-    >>> from utils.plotting import plot_linear_signal
+    >>> from nOmicron.microscope import IO
+    >>> from nOmicron.utils.plotting import plot_linear_signal
     >>> IO.connect()
     >>> v, I = get_point_spectra("I(V)", start_end=[0, 1], target_position=[0, 0], ...
     >>>                   repeats=3, sample_points=50, sample_time=10e-3, forward_back=True)
@@ -177,7 +177,7 @@ def get_point_spectra(channel_name, target_position, start_end, sample_time, sam
 
 
 if __name__ == '__main__':
-    from utils.plotting import plot_linear_signal
+    from nOmicron.utils.plotting import plot_linear_signal
     IO.connect()
     t, I1 = get_continuous_signal("I(t)", sample_time=5, sample_points=50)
 

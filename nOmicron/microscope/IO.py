@@ -1,7 +1,7 @@
 # Oliver Gordon, 2019
 
-import mate.objects as mo
-from utils import utils
+import nOmicron.mate.objects as mo
+from nOmicron.utils import utils
 import re
 
 def connect():
@@ -26,7 +26,7 @@ def enable_channel(channel_name):
     """Enables a channel (e.g. Z_Fw, I_Bw, I_t, Aux1_t, I_V, I_Z) for measurement.
     Examples
     --------
-    >>> from microscope import IO
+    >>> from nOmicron.microscope import IO
     >>> IO.connect()
     >>> IO.enable_channel("I_t")
     """
@@ -71,7 +71,7 @@ def set_clock(sample_time, sample_points):
 
     Examples
     --------
-    >>> from microscope import IO
+    >>> from nOmicron.microscope import IO
     >>> IO.connect()
     >>> IO.enable_channel("Z_t")
     >>> IO.set_clock(1e-2, 200)  # 100 milliseconds, 200 points will be acquired on next trigger

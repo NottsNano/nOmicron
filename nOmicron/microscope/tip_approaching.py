@@ -1,6 +1,6 @@
 # Oliver Gordon, 2019
 
-from mate import objects as mo
+from nOmicron.mate import objects as mo
 
 def approach(v_gap, cautiousness):
     modes = {"Super Cautious": {"Loop_Gain_I": 3, "I_Setpoint": 50e-12},

@@ -5,9 +5,9 @@ import warnings
 import numpy as np
 from tqdm import tqdm
 
-import mate.objects as mo
-from microscope import IO
-from utils.plotting import plot_xy
+import nOmicron.mate.objects as mo
+from nOmicron.microscope import IO
+from nOmicron.utils.plotting import plot_xy
 
 
 def set_scan_position(xy_pos=None, width_height=None, angle=None):
@@ -62,8 +62,8 @@ def get_xy_scan(channel_name, x_direction, y_direction, num_lines='all'):
 
     Examples
     --------
-    >>> from microscope import IO
-    >>> from utils.plotting import plot_xy
+    >>> from nOmicron.microscope import IO
+    >>> from nOmicron.utils.plotting import plot_xy
     >>> IO.connect()
     >>> xydata = get_xy_scan("Z", x_direction="Forward", y_direction="Up-Down")
     >>> plot_xy(xydata, pixel_scale=mo.xy_scanner.Width() * 1e9 / mo.xy_scanner.Points())

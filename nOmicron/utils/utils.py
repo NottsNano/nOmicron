@@ -1,14 +1,11 @@
 # Oliver Gordon, 2019
 
-import inspect
 import json
-import sys
-import warnings
 import inspect
 import sys
 import warnings
 
-import mate.objects as mo
+import nOmicron.mate.objects as mo
 
 
 def is_online():
@@ -92,7 +89,7 @@ def read_min_max(module, parameter, test=0):
     """Reads the minimum and maximum allowed values for settable parameters."""
     p = 'function'
     module = _friendly_name_to_mate(module)
-    members = inspect.getmembers(sys.modules['mate.objects'], inspect.isclass)
+    members = inspect.getmembers(sys.modules['nOmicron.mate.objects'], inspect.isclass)
     inspected = [item[1] for item in members if item[0] == module][0]
 
     def get_value(min_max):

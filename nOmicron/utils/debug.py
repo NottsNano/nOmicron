@@ -1,9 +1,9 @@
 # Oliver Gordon, 2019
 
 import ctypes
-import mate.objects as mo
+import nOmicron.mate.objects as mo
 
-from microscope import IO
+from nOmicron.microscope import IO
 
 
 def view_channel_properties(channel_name):
