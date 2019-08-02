@@ -170,9 +170,9 @@ def get_point_spectra(channel_name, target_position, start_end, sample_time, sam
 
 if __name__ == '__main__':
     IO.connect()
-    # t, I1 = get_continuous_signal("I(t)", sample_time=2, sample_points=50)
+    # t, I1 = get_continuous_signal("I(t)", sample_time=5, sample_points=50)
 
     # Do a fixed point spec
-    v, I2 = get_point_spectra("I(V)", start_end=(0, 1), target_position=[0, 0],
+    v, I2 = get_point_spectra("I(V)", start_end=(0, 1), target_position=[0, 0.5],
                               repeats=3, sample_points=50, sample_time=10e-3, forward_back=True)
     #IO.disconnect()

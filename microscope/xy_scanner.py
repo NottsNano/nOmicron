@@ -28,8 +28,6 @@ def set_scan_position(xy_pos=None, width_height=None, angle=None):
 
 
 def set_points_lines(points=None, lines=None):
-    print(points)
-    print(lines)
     mo.experiment.stop()
     mo.xy_scanner.Points_Lines_Constrained(True)
     if points != lines:
@@ -47,11 +45,12 @@ def get_xy_scan(channel_name, x_direction, y_direction, num_lines='all'):
 
     if num_lines == 'all':
         num_lines = mo.xy_scanner.Lines()
+    lines_per = num_lines
     if y_direction == "Up-Down":
-        num_lines*2
-        mo.xy_scanner.Y_Retrace(True)
-        if num_lines != mo.xy_scanner.Lines():  # Force set lines instead?
+        if num_lines != 'all' and num_lines != mo.xy_scanner.Lines():  # Force set lines instead?
             raise ValueError("If scanning in both directions, num_lines cannot be set")
+        num_lines = num_lines*2
+        mo.xy_scanner.Y_Retrace(True)
     else:
         mo.xy_scanner.Y_Retrace(False)
     if x_direction != "Forward":
@@ -59,9 +58,8 @@ def get_xy_scan(channel_name, x_direction, y_direction, num_lines='all'):
 
     view_count = [None, None]
     line_count = 0
-    xydata = np.zeros((mo.xy_scanner.Points(), mo.xy_scanner.Lines()))
+    xydata = np.zeros((2, mo.xy_scanner.Points(), mo.xy_scanner.Lines()))
     xydata[:] = np.nan
-    xydata = [xydata, xydata]
     dir_dict = {"Forward": "Fw",
                 "Backward": "Bw"}
 
@@ -70,11 +68,11 @@ def get_xy_scan(channel_name, x_direction, y_direction, num_lines='all'):
         line_count += 1
         pbar.update(1)
         if mo.view.Packet_Count() != line_count:
-            warnings.warn("Not all lines delivered in time (?). Is the scan speed too fast?")
+            warnings.warn("Not all lines delivered in time. Matrix may be unstable.")
 
         data_size = mo.view.Data_Size()
-        line_count // mo.xy_scanner.Lines()
-        xydata[line_count // mo.xy_scanner.Lines()][line_count - 1, :] = np.array(mo.sample_data(data_size))
+        scan_dir = (line_count - 1) // mo.xy_scanner.Lines()
+        xydata[scan_dir, (line_count - lines_per*scan_dir) - 1, :] = np.array(mo.sample_data(data_size))
         view_count = [mo.view.Run_Count(), mo.view.Cycle_Count()]
         mo.xy_scanner.resume()
 
@@ -92,16 +90,16 @@ def get_xy_scan(channel_name, x_direction, y_direction, num_lines='all'):
     mo.experiment.stop()
     IO.disable_channel()
 
+    xydata = list(np.flipud(xydata))
     if y_direction == "Up":
         xydata = xydata[0]
 
-    xydata = np.flipud(xydata)
     return xydata
 
 
 if __name__ == "__main__":
     IO.connect()
-    set_points_lines(64)
+    set_points_lines(100)
     xydata = get_xy_scan(channel_name="Z", x_direction="Forward", y_direction="Up-Down")
 
     plot_xy(xydata, view_count, pixel_scale=mo.xy_scanner.Width() * 1e9 / mo.xy_scanner.Points())
