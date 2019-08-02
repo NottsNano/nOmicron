@@ -41,6 +41,34 @@ def set_points_lines(points=None, lines=None):
 
 
 def get_xy_scan(channel_name, x_direction, y_direction, num_lines='all'):
+    """
+    Perform and get an xy scan
+
+    Parameters
+    ----------
+    channel_name : str
+        The channel to acquire from, e.g. Z, I, Aux1, Aux2
+    x_direction : str
+        Must be one of 'Forward' or 'Back'. 'Back' is currently not tested
+    y_direction : str
+        Must be one of 'Up' or 'Up-Down'
+    num_lines : int or str
+        Number of lines to get. If an int, must be less than the number of lines in the scanner window.
+
+
+    Returns
+    -------
+    xydata : numpy array if y_direction == "Up", list of two numpy arrays if y_direction == "Down"
+
+    Examples
+    --------
+    >>> from microscope import IO
+    >>> from utils.plotting import plot_xy
+    >>> IO.connect()
+    >>> xydata = get_xy_scan("Z", x_direction="Forward", y_direction="Up-Down")
+    >>> plot_xy(xydata, pixel_scale=mo.xy_scanner.Width() * 1e9 / mo.xy_scanner.Points())
+    >>> IO.disconnect()
+    """
     global line_count, xydata, view_count
 
     if num_lines == 'all':
