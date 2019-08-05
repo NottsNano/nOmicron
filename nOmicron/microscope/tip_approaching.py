@@ -2,6 +2,11 @@
 
 from nOmicron.mate import objects as mo
 
+
+def set_gap_voltage(voltage):
+    mo.gap_voltage_control.Voltage(voltage)
+
+
 def approach(v_gap, cautiousness):
     modes = {"Super Cautious": {"Loop_Gain_I": 3, "I_Setpoint": 50e-12},
              "Cautious": {"Loop_Gain_I": 3, "I_Setpoint": 50e-12},

@@ -140,6 +140,36 @@ class _GapVoltageControl(object):
         a = _process(p, [self, _inspect.stack()[0][3]], a, test)
         return a
 
+    def Tip_Cond_Enable_Feedback_Loop(self, a=None, test=True):
+        p = 'boolean'
+        a = _process(p, [self, _inspect.stack()[0][3]], a, test)
+        return a
+
+    def Tip_Cond_Pulse_Time(self, a=None, test=0.0):
+        """Tip pulse time."""
+        p = 'double'
+        is_parameter_allowable(a, self.__class__.__name__, _inspect.stack()[0][3], test)
+        a = _process(p, [self, _inspect.stack()[0][3]], a, test)
+        return a
+
+    def Tip_Cond_Pulse_Voltage(self, a=None, test=0.0):
+        """Tip pulse voltage."""
+        p = 'double'
+        is_parameter_allowable(a, self.__class__.__name__, _inspect.stack()[0][3], test)
+        a = _process(p, [self, _inspect.stack()[0][3]], a, test)
+        return a
+
+    def Tip_Cond_Pulse_Preamp_Range(self, a=None, test=0.0):
+        """Tip pulse voltage range. 0 -> (-1,1). 1-> (-10, 10)."""
+        p = 'enum'
+        # is_parameter_allowable(a, self.__class__.__name__, _inspect.stack()[0][3], test)
+        a = _process(p, [self, _inspect.stack()[0][3]], a, test)
+        return a
+
+    def Tip_Cond_Pulse_Apply(self, f=None, *args, **kwargs):
+        """Does a tip conditioning"""
+        p = 'set_observed'
+        out = _process(p, [self, _inspect.stack()[0][3]], f, *args, **kwargs)
 
 class _PiezoControl(object):
     """Controls tip approach."""
@@ -206,6 +236,29 @@ class _Regulator(object):
 
     def Enable_Z_Offset_Slew_Rate(self, a=None, test=False):
         p = 'boolean'
+        a = _process(p, [self, _inspect.stack()[0][3]], a, test)
+        return a
+
+    def Z_Ramp(self, a=None, test=0.0):
+        p = 'double'
+        is_parameter_allowable(a, self.__class__.__name__, _inspect.stack()[0][3], test)
+        a = _process(p, [self, _inspect.stack()[0][3]], a, test)
+        return a
+
+    def Z_Ramp_Delay(self, a=None, test=0.0):
+        p = 'double'
+        is_parameter_allowable(a, self.__class__.__name__, _inspect.stack()[0][3], test)
+        a = _process(p, [self, _inspect.stack()[0][3]], a, test)
+        return a
+
+    def Enable_Z_Ramp_Slew_Rate(self, a=None, test=False):
+        p = 'boolean'
+        a = _process(p, [self, _inspect.stack()[0][3]], a, test)
+        return a
+
+    def Z_Ramp_Slew_Rate(self, a=None, test=0.0):
+        p = 'double'
+        is_parameter_allowable(a, self.__class__.__name__, _inspect.stack()[0][3], test)
         a = _process(p, [self, _inspect.stack()[0][3]], a, test)
         return a
 
