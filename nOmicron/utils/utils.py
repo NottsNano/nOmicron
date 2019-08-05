@@ -1,7 +1,7 @@
 # Oliver Gordon, 2019
 
-import json
 import inspect
+import json
 import sys
 import warnings
 
@@ -35,7 +35,7 @@ def is_channel_real(channel_name):
 def is_data_size_set():
     response = mo.view.Data_Size() is int
     if not response:
-        raise ValueError("Data size has not been set/acknowledged by Matrix (?)")
+        warnings.warn("Data size has not been set/acknowledged by Matrix. No data will be sent!")
 
     return response
 
@@ -52,7 +52,14 @@ def is_parameter_within_allowed_range(parameter_name, parameter_value, config_fi
     return response
 
 
+def _force_set_scope(scope_name):
+    """Forcibly sets the experiment scope e.g. STM_Basic"""
+    mo.mate.scope = scope_name
+    mo.mate.lib_mate.setScopeName(scope_name)
+
+
 def _friendly_name_to_mate(module_name):
+    """Slightly hacky code to convert friendly mo.objects names to the mate4dummies mo.mate format"""
     all_modules = {"channel": "_Channel",
                    "clock": "_Clock",
                    "experiment": "_Experiment",
@@ -73,27 +80,70 @@ def _friendly_name_to_mate(module_name):
     return mate_name
 
 
-def is_parameter_allowable(a, module, parameter, test=0):
-    min_max = read_min_max(module, parameter, test)
+def is_parameter_allowable(value, experiment_element, parameter, test=0):
+    """
+    Checks if a parameter is allowable within the reported operating range of the equipment.
 
-    if a is not None:
-        response = min_max[0] <= a <= min_max[1]
+    Using this before sending an out of range prevents possible locking up/hard crashes of Matrix.
+
+    Attributes
+    ----------
+    experiment_element : str
+        The experiment element that the desired parameter falls under
+    parameter : str
+        The parameter to be tested
+    value :
+        The value of the parameter
+
+    Returns
+    -------
+    response : bool
+
+    Examples
+    --------
+    >>> is_parameter_allowable(100, "xy_scanner", "Points")
+
+    """
+    min_max = read_min_max(experiment_element, parameter, test)
+
+    if value is not None:
+        response = min_max[0] <= value <= min_max[1]
         if not response:
-            warnings.warn(f"{parameter} should be within range {min_max[0]} <= {parameter} <= {min_max[1]}. Matrix may die")
+            warnings.warn(
+                f"{parameter} should be within range {min_max[0]} <= {parameter} <= {min_max[1]}. Matrix may die")
     else:
         response = None
     return response
 
 
-def read_min_max(module, parameter, test=0):
-    """Reads the minimum and maximum allowed values for settable parameters."""
+def read_min_max(experiment_element, parameter, test=0):
+    """
+    Reads the minimum and maximum allowed values for settable parameters.
+
+    Attributes
+    ----------
+    experiment_element : str
+        The experiment element that the desired parameter falls under
+    parameter : str
+        The parameter to be tested
+
+    Returns
+    -------
+    outs : tuple
+        A tuple in the form [min, max]
+
+    Examples
+    --------
+    >>> read_min_max("xy_scanner", "Points")
+    """
+
     p = 'function'
-    module = _friendly_name_to_mate(module)
+    experiment_element = _friendly_name_to_mate(experiment_element)
     members = inspect.getmembers(sys.modules['nOmicron.mate.objects'], inspect.isclass)
-    inspected = [item[1] for item in members if item[0] == module][0]
+    inspected = [item[1] for item in members if item[0] == experiment_element][0]
 
     def get_value(min_max):
-        if module == "_Clock":
+        if experiment_element == "_Clock":
             out = mo._process(p, [inspected(1.0), min_max], parameter, test)
         else:
             out = mo._process(p, [inspected(), min_max], parameter, test)
