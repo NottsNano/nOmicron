@@ -95,10 +95,14 @@ def get_xy_scan(channel_name, x_direction, y_direction, num_lines='all', mode='n
     >>> plot_xy(xydata, pixel_scale=mo.xy_scanner.Width() * 1e9 / mo.xy_scanner.Points())
     >>> IO.disconnect()
     """
-    global line_count, xydata, view_count
+    global line_count, view_count
 
     if num_lines == 'all':
         num_lines = mo.xy_scanner.Lines()
+
+    xydata = np.zeros((2, num_lines, mo.xy_scanner.Points()))
+    xydata[:] = np.nan
+
     lines_per = num_lines
     if y_direction == "Up-Down":
         if num_lines != 'all' and num_lines != mo.xy_scanner.Lines():  # Force set lines instead?
@@ -112,13 +116,11 @@ def get_xy_scan(channel_name, x_direction, y_direction, num_lines='all', mode='n
 
     view_count = [None, None]
     line_count = 0
-    xydata = np.zeros((2, mo.xy_scanner.Points(), mo.xy_scanner.Lines()))
-    xydata[:] = np.nan
     dir_dict = {"Forward": "Fw",
                 "Backward": "Bw"}
 
     def view_xy_callback():
-        global line_count, xydata, view_count
+        global line_count, view_count
         line_count += 1
         pbar.update(1)
         if mo.view.Packet_Count() != line_count:
@@ -126,7 +128,8 @@ def get_xy_scan(channel_name, x_direction, y_direction, num_lines='all', mode='n
 
         data_size = mo.view.Data_Size()
         scan_dir = (line_count - 1) // mo.xy_scanner.Lines()
-        xydata[scan_dir, (line_count - lines_per * scan_dir) - 1, :] = np.array(mo.sample_data(data_size))
+        test = np.array(mo.sample_data(data_size))
+        xydata[scan_dir, (line_count - lines_per * scan_dir) - 1, :] = test
         view_count = [mo.view.Run_Count(), mo.view.Cycle_Count()]
         mo.xy_scanner.resume()
 
@@ -151,9 +154,11 @@ def get_xy_scan(channel_name, x_direction, y_direction, num_lines='all', mode='n
 
     IO.disable_channel()
 
-    xydata = list(np.flipud(xydata))
+    xydata[0, :, :] = np.flipud(xydata[0, :, :])
     if y_direction == "Up":
-        xydata = xydata[0]
+        xydata = xydata[0, :, :]
+    else:
+        xydata = list(xydata)
 
     return xydata
 
@@ -161,8 +166,8 @@ def get_xy_scan(channel_name, x_direction, y_direction, num_lines='all', mode='n
 if __name__ == "__main__":
     IO.connect()
     set_points_lines(100)
-    xydata = get_xy_scan(channel_name="Z", x_direction="Forward", y_direction="Up-Down")
+    xydata1 = get_xy_scan(channel_name="Z", x_direction="Forward", y_direction="Up")
 
-    plot_xy(xydata, view_count, pixel_scale=mo.xy_scanner.Width() * 1e9 / mo.xy_scanner.Points())
+    plot_xy(xydata1, view_count, pixel_scale=mo.xy_scanner.Width() * 1e9 / mo.xy_scanner.Points())
 
     mo.experiment.Result_File_Name()

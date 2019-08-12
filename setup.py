@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='nOmicron',
-    version='1.0.0',
+    version='1.1.1',
     url='https://github.com/OGordon100/nOmicron',
     license='GPL v3.0',
     author='Oliver Gordon',
