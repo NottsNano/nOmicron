@@ -95,7 +95,7 @@ def get_xy_scan(channel_name, x_direction, y_direction, num_lines='all', mode='n
     >>> plot_xy(xydata, pixel_scale=mo.xy_scanner.Width() * 1e9 / mo.xy_scanner.Points())
     >>> IO.disconnect()
     """
-    global line_count, view_count
+    global line_count, view_count, xydata
 
     if num_lines == 'all':
         num_lines = mo.xy_scanner.Lines()
@@ -111,8 +111,12 @@ def get_xy_scan(channel_name, x_direction, y_direction, num_lines='all', mode='n
         mo.xy_scanner.Y_Retrace(True)
     else:
         mo.xy_scanner.Y_Retrace(False)
+
     if x_direction != "Forward":
+        mo.xy_scanner.X_Retrace(True)
         raise NotImplementedError
+    else:
+        mo.xy_scanner.X_Retrace(False)
 
     view_count = [None, None]
     line_count = 0
@@ -120,7 +124,7 @@ def get_xy_scan(channel_name, x_direction, y_direction, num_lines='all', mode='n
                 "Backward": "Bw"}
 
     def view_xy_callback():
-        global line_count, view_count
+        global line_count, view_count, xydata
         line_count += 1
         pbar.update(1)
         if mo.view.Packet_Count() != line_count:
@@ -166,7 +170,7 @@ def get_xy_scan(channel_name, x_direction, y_direction, num_lines='all', mode='n
 if __name__ == "__main__":
     IO.connect()
     set_points_lines(100)
-    xydata1 = get_xy_scan(channel_name="Z", x_direction="Forward", y_direction="Up")
+    xydata1 = get_xy_scan(channel_name="Z", x_direction="Forward", y_direction="Up", num_lines=1)
 
     plot_xy(xydata1, view_count, pixel_scale=mo.xy_scanner.Width() * 1e9 / mo.xy_scanner.Points())
 
