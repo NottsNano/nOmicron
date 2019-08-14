@@ -63,6 +63,38 @@ def set_points_lines(points=None, lines=None):
     mo.xy_scanner.Points(points)
     mo.xy_scanner.Lines(lines)
 
+def set_scan_speed(scan=None, move=None):
+    """
+    Sets the scan and move t-raster elements
+
+    Parameters
+    ----------
+    scan : float or None
+        Time span between two adjacent raster points, in seconds
+    move : float or None
+        Time span between movements of the y scan, in seconds
+
+    Examples
+    --------
+    Set both scan and move to 150ms
+    >>> set_scan_speed(150e-3)
+
+    Set both points and lines to 150ms
+    >>> set_scan_speed(points=150e-3, lines=150e-3)
+
+    Set points and lines to different amounts
+    >>> set_scan_speed(110e-3, 130e-3)
+    """
+    mo.xy_scanner.Move_Raster_Time_Constrained(True)
+    if scan != move:
+        if scan is not None and move is not None:
+            mo.xy_scanner.Move_Raster_Time_Constrained(False)
+        else:
+            scan = move
+
+    mo.xy_scanner.Raster_Time(scan)
+    mo.xy_scanner.Move_Raster_Time(move)
+
 
 def get_xy_scan(channel_name, x_direction, y_direction, num_lines='all', mode='new'):
     """

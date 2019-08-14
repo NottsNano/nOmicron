@@ -437,7 +437,21 @@ class _XYScanner(object):
         a = _process(p, [self, _inspect.stack()[0][3]], a, test)
         return a
 
+    def Move_Raster_Time_Constrained(self, a=None, test=False):
+        """Boolean of if scan raster and move should be locked together"""
+        p = 'boolean'
+        a = _process(p, [self, _inspect.stack()[0][3]], a, test)
+        return a
+
     def Raster_Time(self, a=None, test=0.0):
+        """Time in seconds to move between scanning points. Identical to XYScanner.Move_Raster_Time. Real value is
+        shown with Scan_Speed"""
+        p = 'double'
+        is_parameter_allowable(a, self.__class__.__name__, _inspect.stack()[0][3], test)
+        a = _process(p, [self, _inspect.stack()[0][3]], a, test)
+        return a
+
+    def Move_Raster_Time(self, a=None, test=0.0):
         """Time in seconds to move between scanning points. Identical to XYScanner.Move_Raster_Time. Real value is
         shown with Scan_Speed"""
         p = 'double'
