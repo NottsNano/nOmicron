@@ -717,6 +717,9 @@ class _Spectroscopy:
 
 def _process(p, caller, a, *args, **kwargs):
     global event_objects, _test_event_object
+    if not hasattr(mate, "lib_mate"):
+        raise IOError("Matrix is not connected. Make sure you run IO.connect()")
+
     if caller[0].__class__.__name__ == '_Experiment':
         obj = mate.scope + '.' + caller[1]
     elif caller[0].__class__.__name__ == '_Channel':
