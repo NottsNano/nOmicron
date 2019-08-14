@@ -4,7 +4,7 @@ import numpy as np
 from nOmicron.mate import objects as mo
 
 
-def tip_pulse(voltage, time, num_pulses=1, feedback_loop=True):
+def tip_pulse(voltage, time, num_pulses=1, pos=None, feedback_loop=True):
     """
     Performs a tip voltage pulse.
 
@@ -16,12 +16,17 @@ def tip_pulse(voltage, time, num_pulses=1, feedback_loop=True):
         The time (in seconds)
     num_pulses : int
         The number of times to pulse. Default is 1
+    pos : None or tuple
+        The position to do the pulse at, in normalised co-ords. If None, do it at the current tip position
     feedback_loop : bool
         If the feedback loop is on or not. Default True
     """
 
+    mo.xy_scanner.Execute_Port_Colour("VPulse")
     if np.abs(voltage) >= 1:
         mo.gap_voltage_control.Tip_Cond_Pulse_Preamp_Range(1)
+    else:
+        mo.gap_voltage_control.Tip_Cond_Pulse_Preamp_Range(0)
     mo.gap_voltage_control.Tip_Cond_Enable_Feedback_Loop(True)
 
     if not feedback_loop:
@@ -30,13 +35,25 @@ def tip_pulse(voltage, time, num_pulses=1, feedback_loop=True):
     mo.gap_voltage_control.Tip_Cond_Pulse_Time(time)
     mo.gap_voltage_control.Tip_Cond_Pulse_Voltage(voltage)
 
+    if pos is not None:
+        mo.xy_scanner.Store_Current_Position(True)
+        mo.xy_scanner.Target_Position(pos)
+
     for i in range(num_pulses):
         mo.experiment.pause()
-        mo.gap_voltage_control.Tip_Cond_Pulse_Apply()
+        if pos is None:
+            mo.xy_scanner.execute()
+        else:
+            mo.xy_scanner.Trigger_Execute_At_Target_Position(True)
+            mo.xy_scanner.move()
+            mo.xy_scanner.Trigger_Execute_At_Target_Position(False)
         mo.experiment.resume()
 
+    if pos is not None:
+        mo.xy_scanner.Return_To_Stored_Position(True)
+        mo.xy_scanner.Store_Current_Position(False)
 
-def tip_crash(delta_z, crash_position=(-1, -1), delay=0, slew_rate=None):
+def tip_crash(delta_z, pos=(-1, -1), delay=0, slew_rate=None):
     """
     Performs a controlled tip indendation.
 
@@ -44,7 +61,7 @@ def tip_crash(delta_z, crash_position=(-1, -1), delay=0, slew_rate=None):
     ----------
     delta_z : float
         The depth to ramp in meters
-    crash_position : tuple
+    pos : tuple
         The position in normalised co-ordinate range(-1, 1) to perform the crash at.
         Default is (-1, -1), which corresponds to the bottom left corner of the scan window
     delay : float
@@ -54,6 +71,7 @@ def tip_crash(delta_z, crash_position=(-1, -1), delay=0, slew_rate=None):
         The slew rate in metres/second. Not enabled in None (default)
 
     """
+    mo.xy_scanner.Execute_Port_Colour("ZRamp")
     mo.regulator.Enable_Z_Ramp_Slew_Rate(False)
     mo.regulator.Z_Ramp_Delay(delay)
     mo.regulator.Z_Ramp(delta_z)
@@ -65,7 +83,7 @@ def tip_crash(delta_z, crash_position=(-1, -1), delay=0, slew_rate=None):
     mo.experiment.pause()
     mo.xy_scanner.Execute_Port_Colour("ZRamp")
     mo.xy_scanner.Store_Current_Position(True)
-    mo.xy_scanner.Target_Position(crash_position)
+    mo.xy_scanner.Target_Position(pos)
     mo.xy_scanner.Trigger_Execute_At_Target_Position(True)
 
     mo.xy_scanner.move()

@@ -90,7 +90,7 @@ def set_scan_speed(scan=None, move=None):
         if scan is not None and move is not None:
             mo.xy_scanner.Move_Raster_Time_Constrained(False)
         else:
-            scan = move
+            move = scan
 
     mo.xy_scanner.Raster_Time(scan)
     mo.xy_scanner.Move_Raster_Time(move)
@@ -209,7 +209,7 @@ def get_xy_scan(channel_name, x_direction, y_direction, num_lines='all', mode='n
 
 if __name__ == "__main__":
     IO.connect()
-    set_points_lines(100)
+    set_points_lines(128)
     xydata1 = get_xy_scan(channel_name="Z", x_direction="Forward", y_direction="Up", num_lines=1)
 
     plot_xy(xydata1, view_count, pixel_scale=mo.xy_scanner.Width() * 1e9 / mo.xy_scanner.Points())

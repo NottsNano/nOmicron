@@ -166,10 +166,20 @@ class _GapVoltageControl(object):
         a = _process(p, [self, _inspect.stack()[0][3]], a, test)
         return a
 
-    def Tip_Cond_Pulse_Apply(self, f=None, *args, **kwargs):
-        """Does a tip conditioning"""
-        p = 'set_observed'
-        out = _process(p, [self, _inspect.stack()[0][3]], f, *args, **kwargs)
+    # def Tip_Cond_Pulse_Apply(self, f=None, *args, **kwargs):
+    #     """Does a tip conditioning"""
+    #     p = 'set_observed'
+    #     out = _process(p, [self, _inspect.stack()[0][3]], f, *args, **kwargs)
+
+    def Tip_Cond_Pulse_Apply(self):
+        """Super powerful. Do something, then run the trigger function on completion"""
+        p = 'function'
+        out = _process(p, [self, _inspect.stack()[0][3]], None)
+
+    def Execute(self):
+        """Execute spectroscopy"""
+        p = 'function'
+        out = _process(p, [self, _inspect.stack()[0][3]], None)
 
 class _PiezoControl(object):
     """Controls tip approach."""
@@ -456,6 +466,12 @@ class _XYScanner(object):
         shown with Scan_Speed"""
         p = 'double'
         is_parameter_allowable(a, self.__class__.__name__, _inspect.stack()[0][3], test)
+        a = _process(p, [self, _inspect.stack()[0][3]], a, test)
+        return a
+
+    def Enable_Execute_Port(self, a=None, test=False):
+        """Set to True to return the probe to the position set by XYScanner.Store_Current_Position"""
+        p = 'boolean'
         a = _process(p, [self, _inspect.stack()[0][3]], a, test)
         return a
 
