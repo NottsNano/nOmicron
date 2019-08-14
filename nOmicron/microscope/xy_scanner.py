@@ -176,7 +176,7 @@ def get_xy_scan(channel_name, x_direction, y_direction, num_lines='all', mode='n
 
 
 if __name__ == "__main__":
-    #IO.connect()
+    IO.connect()
     set_points_lines(100)
     xydata1 = get_xy_scan(channel_name="Z", x_direction="Forward", y_direction="Up", num_lines=1)
 
