@@ -79,7 +79,7 @@ def get_xy_scan(channel_name, x_direction, y_direction, num_lines='all', mode='n
     num_lines : int or str
         Number of lines to get. If an int, must be less than the number of lines in the scanner window.
     mode : str
-        Must be one of ['new', 'continue']. Default is 'new'
+        Must be one of ['new', 'pause', 'continue']. Default is 'new'
 
 
     Returns
@@ -96,6 +96,10 @@ def get_xy_scan(channel_name, x_direction, y_direction, num_lines='all', mode='n
     >>> IO.disconnect()
     """
     global line_count, view_count, xydata
+
+    allowed = ["new", "pause", "continue"]
+    if mode not in allowed:
+        raise ValueError(f"Mode must be one of {allowed}")
 
     if num_lines == 'all':
         num_lines = mo.xy_scanner.Lines()
@@ -114,7 +118,7 @@ def get_xy_scan(channel_name, x_direction, y_direction, num_lines='all', mode='n
 
     if x_direction != "Forward":
         mo.xy_scanner.X_Retrace(True)
-        raise NotImplementedError
+        #raise NotImplementedError
     else:
         mo.xy_scanner.X_Retrace(False)
 
@@ -144,8 +148,10 @@ def get_xy_scan(channel_name, x_direction, y_direction, num_lines='all', mode='n
     mo.allocate_sample_memory(mo.xy_scanner.Points())
     if mode == 'new':
         mo.experiment.start()
-    else:
+    elif mode == 'pause':
         mo.experiment.resume()
+    else:
+        pass
 
     pbar = tqdm(total=num_lines)
     while line_count < num_lines and mo.mate.rc == mo.mate.rcs['RMT_SUCCESS']:
@@ -153,8 +159,10 @@ def get_xy_scan(channel_name, x_direction, y_direction, num_lines='all', mode='n
 
     if mode == 'new':
         mo.experiment.stop()
-    else:
+    elif mode == 'pause':
         mo.experiment.pause()
+    else:
+        pass
 
     IO.disable_channel()
 

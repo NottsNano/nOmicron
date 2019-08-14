@@ -23,6 +23,12 @@ Recommended method is to install from PyPi with ``pip install nOmicron``
 
 ---
 
+### Citing
+
+If you use nOmicron in your research, it would be appreciated if you could cite via the DOI in the badge
+
+---
+
 ### Setting & Getting Parameters
 
 After opening Matrix and initialising a connection to your SPM, initialise the code with
@@ -85,7 +91,7 @@ plot_xy(xydata, view_count, pixel_scale=mo.xy_scanner.Width() * 1e9 / mo.xy_scan
 
 Spectroscopy is performable with the ``microscope.continuous_spectroscopy.get_point_spectra`` function
 ```
-from nOmicron.microscopy.continuous_spectroscopy import get_point_spectra
+from nOmicron.microscope.continuous_spectroscopy import get_point_spectra
 V, I = get_point_spectra("I(V)", start_end=(0, 4), target_position=[0, 1],
                           repeats=2, sample_points=50, sample_time=10e-3, 
                           forward_back=True)
@@ -93,7 +99,7 @@ V, I = get_point_spectra("I(V)", start_end=(0, 4), target_position=[0, 1],
 
 Time series data can be captured with the ``microscope.continuous_spectroscopy.get_continuous_signal`` function
 ```
-from nOmicron.microscopy.continuous_spectroscopy import get_continuous_signal
+from nOmicron.microscope.continuous_spectroscopy import get_continuous_signal
 t, I = get_continuous_signal("I(t)", sample_time=2, sample_points=50)
 ```
 For ease of use, common routines are abstracted from the underlying MATE code
