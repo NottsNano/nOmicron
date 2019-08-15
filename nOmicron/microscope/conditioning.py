@@ -53,6 +53,7 @@ def tip_pulse(voltage, time, num_pulses=1, pos=None, feedback_loop=True):
         mo.xy_scanner.Return_To_Stored_Position(True)
         mo.xy_scanner.Store_Current_Position(False)
 
+
 def tip_crash(delta_z, pos=(-1, -1), delay=0, slew_rate=None):
     """
     Performs a controlled tip indendation.
