@@ -1,4 +1,4 @@
-# nOmicron
+# nOmicron [![DOI](https://zenodo.org/badge/199644460.svg)](https://zenodo.org/badge/latestdoi/199644460)
 
 
 ### About
@@ -25,7 +25,7 @@ Recommended method is to install from PyPi with ``pip install nOmicron``
 
 ### Citing
 
-If you use nOmicron in your research, it would be appreciated if you could cite via the DOI in the badge
+If you use nOmicron in your research, it would be appreciated if you could cite via ``DOI : 10.5281/zenodo.3368927``
 
 ---
 
