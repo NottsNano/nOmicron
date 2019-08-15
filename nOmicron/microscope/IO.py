@@ -83,3 +83,25 @@ def set_clock(sample_time, sample_points):
     mo.clock.Period(sample_time / sample_points)
     mo.clock.Samples(sample_points)
     mo.clock.Enable(True)
+
+
+def intercept_target_position():
+    """Intercepts the tip target position set with the mouse tool
+
+    Returns
+    -------
+    target_pos : tuple
+
+    Examples
+    --------
+    Intercept the xy position of a manual spectroscopy, and allow the data to be passed into python
+    >>> from nOmicron.microscope.continuous_spectroscopy import get_point_spectra
+    >>> pos = intercept_target_position()
+    >>> v, I = get_point_spectra("I(V)", start_end=(0.5, -0.5), target_position=pos,
+                          repeats=1, sample_points=100, sample_time=20e-3, forward_back=False)
+    """
+    current_pos = mo.xy_scanner.Target_Position()
+    while current_pos == mo.xy_scanner.Target_Position():
+        pass
+
+    return current_pos
