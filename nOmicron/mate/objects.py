@@ -620,6 +620,10 @@ class _XYScanner(object):
         p = 'function'
         out = _process(p, [self, _inspect.stack()[0][3]], None)
 
+    def Operation_Cancelled(self):
+        """Move the tip to the position set with Target_Position"""
+        p = 'function'
+        out = _process(p, [self, _inspect.stack()[0][3]], None)
 
 class _Spectroscopy:
     """Controls spectroscopy. Device 1&2 are the first two channels in the Matrix window (?)."""

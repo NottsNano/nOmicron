@@ -92,16 +92,22 @@ def intercept_target_position():
     -------
     target_pos : tuple
 
+    Warnings
+    --------
+    If using this function to call a routine e.g. continuous_spectra.get_point_spectra(), do NOT execute a spectroscopy
+    in Matrix to exectute this function - this will very often result in one data packet being missed. Instead, perform
+    a non-trigger task, such as a tip relocation.
+
     Examples
     --------
     Intercept the xy position of a manual spectroscopy, and allow the data to be passed into python
     >>> from nOmicron.microscope.continuous_spectroscopy import get_point_spectra
     >>> pos = intercept_target_position()
     >>> v, I = get_point_spectra("I(V)", start_end=(0.5, -0.5), target_position=pos,
-                          repeats=1, sample_points=100, sample_time=20e-3, forward_back=False)
+    >>>                   repeats=1, sample_points=100, sample_time=20e-3, forward_back=False)
     """
-    current_pos = mo.xy_scanner.Target_Position()
-    while current_pos == mo.xy_scanner.Target_Position():
-        pass
+    current_pos = old_pos = mo.xy_scanner.Target_Position()
+    while old_pos == current_pos:
+        current_pos = mo.xy_scanner.Target_Position()
 
     return current_pos
