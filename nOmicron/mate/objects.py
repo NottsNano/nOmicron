@@ -181,6 +181,7 @@ class _GapVoltageControl(object):
         p = 'function'
         out = _process(p, [self, _inspect.stack()[0][3]], None)
 
+
 class _PiezoControl(object):
     """Controls tip approach."""
 
@@ -334,6 +335,7 @@ class _Regulator(object):
         p = 'boolean'
         a = _process(p, [self, _inspect.stack()[0][3]], a, test)
         return a
+
 
 class _View(object):
     """Allows for the delivery of data. Open the channel with IO.py, set Deliver_Data to True and return data
@@ -625,6 +627,7 @@ class _XYScanner(object):
         p = 'function'
         out = _process(p, [self, _inspect.stack()[0][3]], None)
 
+
 class _Spectroscopy:
     """Controls spectroscopy. Device 1&2 are the first two channels in the Matrix window (?)."""
 
@@ -694,7 +697,7 @@ class _Spectroscopy:
         a = _process(p, [self, _inspect.stack()[0][3]], a, test)
         return a
 
-    def Enable_Device_1_Ramp_Reversal(self, a=None, test=True):
+    def Enable_Device_1_Ramp_Reversal(self, a=None, test=False):
         """More dragons."""
         p = 'boolean'
         a = _process(p, [self, _inspect.stack()[0][3]], a, test)
@@ -742,10 +745,152 @@ class _Spectroscopy:
         a = _process(p, [self, _inspect.stack()[0][3]], a, test)
         return a
 
-    def Enable_Device_2_Ramp_Reversal(self, a=None, test=True):
+    def Enable_Device_2_Ramp_Reversal(self, a=None, test=False):
         """More dragons."""
         p = 'boolean'
         a = _process(p, [self, _inspect.stack()[0][3]], a, test)
+        return a
+
+
+class _PLLControl(object):
+    """Controls the PLL regulator"""
+
+    def Enable_Tip_Protection(self, a=None, test=False):
+        is_parameter_allowable(a, self.__class__.__name__, _inspect.stack()[0][3], test)
+        p = 'boolean'
+        a = _process(p, [self, _inspect.stack()[0][3]], a, test)
+        return a
+
+    def Enable_Constant_Excitation_Mode(self, a=None, test=False):
+        is_parameter_allowable(a, self.__class__.__name__, _inspect.stack()[0][3], test)
+        p = 'boolean'
+        a = _process(p, [self, _inspect.stack()[0][3]], a, test)
+        return a
+
+    def PLL_Enable(self, a=None, test=False):
+        is_parameter_allowable(a, self.__class__.__name__, _inspect.stack()[0][3], test)
+        p = 'boolean'
+        a = _process(p, [self, _inspect.stack()[0][3]], a, test)
+        return a
+
+    def Auto_Phase(self, a=None, test=False):
+        is_parameter_allowable(a, self.__class__.__name__, _inspect.stack()[0][3], test)
+        p = 'boolean'
+        a = _process(p, [self, _inspect.stack()[0][3]], a, test)
+        return a
+
+    def PLL_Centre_Frequency(self, a=None, test=0.0):
+        p = 'double'
+        is_parameter_allowable(a, self.__class__.__name__, _inspect.stack()[0][3], test)
+        a = _process(p, [self, _inspect.stack()[0][3]], a, test)
+        return a
+
+    def Amplitude_Detection_Mode(self, a=None, test=0):
+        """0 = frequency selective, 1 = broadband"""
+        p = 'enum'
+        # is_parameter_allowable(a, self.__class__.__name__, _inspect.stack()[0][3], test)
+        a = _process(p, [self, _inspect.stack()[0][3]], a, test)
+        return a
+
+    def Sensor_Resonance_Frequency_Range(self, a=None, test=0):
+        """0 = 12.5-40 kHz, 1 = 15-60 kHz, 2 = 50-200 kHz, 3 = 150-500 kHz, 4 = 375-1250 kHz"""
+        p = 'enum'
+        # is_parameter_allowable(a, self.__class__.__name__, _inspect.stack()[0][3], test)
+        a = _process(p, [self, _inspect.stack()[0][3]], a, test)
+        return a
+
+    def Non_Contact_Mode(self, a=None, test=0):
+        """0 = constant amplitude, 1 = constant excitation, 2 = self excitation"""
+        p = 'enum'
+        # is_parameter_allowable(a, self.__class__.__name__, _inspect.stack()[0][3], test)
+        a = _process(p, [self, _inspect.stack()[0][3]], a, test)
+        return a
+
+    def Excitation_Attenuation_Constant_Amplitude(self, a=None, test=0):
+        """0 = no attenuation, 1 = 0.1, 2 = 0.01, 3 = 0.001"""
+        p = 'enum'
+        # is_parameter_allowable(a, self.__class__.__name__, _inspect.stack()[0][3], test)
+        a = _process(p, [self, _inspect.stack()[0][3]], a, test)
+        return a
+
+    def Excitation_Attenuation_Constant_Excitation(self, a=None, test=0):
+        """0 = no attenuation, 1 = 0.1, 2 = 0.01, 3 = 0.001"""
+        p = 'enum'
+        # is_parameter_allowable(a, self.__class__.__name__, _inspect.stack()[0][3], test)
+        a = _process(p, [self, _inspect.stack()[0][3]], a, test)
+        return a
+
+    def Excitation_Attenuation_Self_Excitation(self, a=None, test=0):
+        """0 = no attenuation, 1 = 0.1, 2 = 0.01, 3 = 0.001"""
+        p = 'enum'
+        # is_parameter_allowable(a, self.__class__.__name__, _inspect.stack()[0][3], test)
+        a = _process(p, [self, _inspect.stack()[0][3]], a, test)
+        return a
+
+    def Amplitude_Loop_Gain_I_Constant_Amplitude(self, a=None, test=0.0):
+        p = 'double'
+        is_parameter_allowable(a, self.__class__.__name__, _inspect.stack()[0][3], test)
+        a = _process(p, [self, _inspect.stack()[0][3]], a, test)
+        return a
+
+    def Amplitude_Loop_Gain_P_Constant_Amplitude(self, a=None, test=0.0):
+        p = 'double'
+        is_parameter_allowable(a, self.__class__.__name__, _inspect.stack()[0][3], test)
+        a = _process(p, [self, _inspect.stack()[0][3]], a, test)
+        return a
+
+    def Amplitude_Loop_Gain_I_Self_Excitation(self, a=None, test=0.0):
+        p = 'double'
+        is_parameter_allowable(a, self.__class__.__name__, _inspect.stack()[0][3], test)
+        a = _process(p, [self, _inspect.stack()[0][3]], a, test)
+        return a
+
+    def Amplitude_Loop_Gain_P_Self_Excitation(self, a=None, test=0.0):
+        p = 'double'
+        is_parameter_allowable(a, self.__class__.__name__, _inspect.stack()[0][3], test)
+        a = _process(p, [self, _inspect.stack()[0][3]], a, test)
+        return a
+
+    def PLL_Loop_Gain_I(self, a=None, test=0.0):
+        p = 'double'
+        is_parameter_allowable(a, self.__class__.__name__, _inspect.stack()[0][3], test)
+        a = _process(p, [self, _inspect.stack()[0][3]], a, test)
+        return a
+
+    def PLL_Loop_Gain_P(self, a=None, test=0.0):
+        p = 'double'
+        is_parameter_allowable(a, self.__class__.__name__, _inspect.stack()[0][3], test)
+        a = _process(p, [self, _inspect.stack()[0][3]], a, test)
+        return a
+
+    def Amplitude(self, test=0.0):
+        """PLL amplitude. Read only"""
+        p = 'double'
+        a = _process(p, [self, _inspect.stack()[0][3]], None, test)
+        return a
+
+    def Delta_f(self, test=0.0):
+        """PLL delta_f (Hz). Read only"""
+        p = 'double'
+        a = _process(p, [self, _inspect.stack()[0][3]], None, test)
+        return a
+
+    def Sensor_Frequency(self, test=0.0):
+        """PLL sensor frequency (Hz). Read only"""
+        p = 'double'
+        a = _process(p, [self, _inspect.stack()[0][3]], None, test)
+        return a
+
+    def Damping(self, test=0.0):
+        """PLL damping voltage (V). Read only"""
+        p = 'double'
+        a = _process(p, [self, _inspect.stack()[0][3]], None, test)
+        return a
+
+    def PLL_Locked(self, test=False):
+        """See if the phase has been locked. Read only"""
+        p = 'boolean'
+        a = _process(p, [self, _inspect.stack()[0][3]], None, test)
         return a
 
 
@@ -884,7 +1029,7 @@ def _exit_handler():
 
 
 def wait_for_event():
-    #print("Waiting...")
+    # print("Waiting...")
     log.AppendText('Waiting for event...\n')
     while _no_event():
         _time.sleep(0.05)
@@ -925,6 +1070,7 @@ clock = _Clock(1.0)
 experiment = _Experiment()
 gap_voltage_control = _GapVoltageControl()
 piezo_control = _PiezoControl()
+pll = _PLLControl()
 regulator = _Regulator()
 view = _View()
 xy_scanner = _XYScanner()

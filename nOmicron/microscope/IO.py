@@ -111,3 +111,11 @@ def intercept_target_position():
         current_pos = mo.xy_scanner.Target_Position()
 
     return current_pos
+
+
+def enable_pll():
+    mo.pll.PLL_Enable(True)
+
+
+def disable_pll():
+    mo.pll.PLL_Enable(False)
