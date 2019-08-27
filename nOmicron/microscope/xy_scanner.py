@@ -207,7 +207,8 @@ def get_xy_scan(channel_name, x_direction, y_direction, num_lines='all', mode='n
         xydata = list(xydata)
 
     if return_filename:
-        return xydata, f"{mo.experiment.Result_File_Path()}\\{mo.experiment.Result_File_Name()}--{view_count[0]}_{view_count[1]}.Z_mtrx"
+        filename = f"{mo.experiment.Result_File_Path()}\\{mo.experiment.Result_File_Name()}--{view_count[0]}_{view_count[1]}.Z_mtrx"
+        return xydata, filename
     else:
         return xydata
 

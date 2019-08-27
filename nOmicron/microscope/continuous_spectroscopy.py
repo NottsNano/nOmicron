@@ -120,7 +120,7 @@ def get_point_spectra(channel_name, target_position, start_end, sample_time, sam
     >>> IO.disconnect()
     """
 
-    global view_count, x_data, y_data
+    global view_count, view_name, x_data, y_data
     modes = {"V": 0, "Z": 1, "Varied Z": 2}  # Varied Z not fully supported yet!
     max_count = (repeats * (forward_back + 1))
     view_count = 0
@@ -129,9 +129,10 @@ def get_point_spectra(channel_name, target_position, start_end, sample_time, sam
     [y_data.append([None] * (bool(forward_back) + 1)) for i in range(repeats)]  # Can't use [] ** repeats
 
     def view_spectroscopy_callback():
-        global view_count, x_data, y_data
+        global view_count, view_name, x_data, y_data
         pbar.update(1)
         view_count += 1
+        view_name = [mo.view.Run_Count(), mo.view.Cycle_Count()]
         cycle_count = mo.view.Cycle_Count() - 1
         packet_count = mo.view.Packet_Count() - 1
         data_size = mo.view.Data_Size()
@@ -175,7 +176,12 @@ def get_point_spectra(channel_name, target_position, start_end, sample_time, sam
         y_data = [item[0] for item in y_data]
     if repeats == 1:
         y_data = y_data[0]
-    return x_data, y_data
+
+    if return_filename:
+        filename = f"{mo.experiment.Result_File_Path()}\\{mo.experiment.Result_File_Name()}--{view_count[0]}_{view_count[1]}.{channel_name}_mtrx"
+        return x_data, y_data, filename
+    else:
+        return x_data, y_data
 
 
 if __name__ == '__main__':
