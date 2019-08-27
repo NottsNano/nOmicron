@@ -74,7 +74,7 @@ def get_continuous_signal(channel_name, sample_time, sample_points):
 
 
 def get_point_spectra(channel_name, target_position, start_end, sample_time, sample_points,
-                      repeats=1, forward_back=True):
+                      repeats=1, forward_back=True, return_filename=False):
     """
     Go to a position and perform fixed point spectroscopy.
 
@@ -94,6 +94,8 @@ def get_point_spectra(channel_name, target_position, start_end, sample_time, sam
         The number of repeat spectra to take for each point
     forward_back : bool
         Scan in both directions, or just one.
+    return_filename : bool, optional
+        If the full file name of the scan should be returned along with the data. Default is False
 
     Returns
     -------

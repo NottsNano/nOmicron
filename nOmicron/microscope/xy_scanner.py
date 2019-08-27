@@ -63,6 +63,7 @@ def set_points_lines(points=None, lines=None):
     mo.xy_scanner.Points(points)
     mo.xy_scanner.Lines(lines)
 
+
 def set_scan_speed(scan=None, move=None):
     """
     Sets the scan and move t-raster elements
@@ -96,7 +97,7 @@ def set_scan_speed(scan=None, move=None):
     mo.xy_scanner.Move_Raster_Time(move)
 
 
-def get_xy_scan(channel_name, x_direction, y_direction, num_lines='all', mode='new'):
+def get_xy_scan(channel_name, x_direction, y_direction, num_lines='all', mode='new', return_filename=False):
     """
     Perform and get an xy scan
 
@@ -110,9 +111,10 @@ def get_xy_scan(channel_name, x_direction, y_direction, num_lines='all', mode='n
         Must be one of 'Up' or 'Up-Down'
     num_lines : int or str
         Number of lines to get. If an int, must be less than the number of lines in the scanner window.
-    mode : str
+    mode : str, optional
         Must be one of ['new', 'pause', 'continue']. Default is 'new'
-
+    return_filename : bool, optional
+        If the full file name of the scan should be returned along with the data. Default is False
 
     Returns
     -------
@@ -150,7 +152,7 @@ def get_xy_scan(channel_name, x_direction, y_direction, num_lines='all', mode='n
 
     if x_direction != "Forward":
         mo.xy_scanner.X_Retrace(True)
-        #raise NotImplementedError
+        # raise NotImplementedError
     else:
         mo.xy_scanner.X_Retrace(False)
 
@@ -204,7 +206,10 @@ def get_xy_scan(channel_name, x_direction, y_direction, num_lines='all', mode='n
     else:
         xydata = list(xydata)
 
-    return xydata
+    if return_filename:
+        return xydata, f"{mo.experiment.Result_File_Path()}\\{mo.experiment.Result_File_Name()}--{view_count[0]}_{view_count[1]}.Z_mtrx"
+    else:
+        return xydata
 
 
 if __name__ == "__main__":

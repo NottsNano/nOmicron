@@ -64,6 +64,7 @@ def _friendly_name_to_mate(module_name):
                    "clock": "_Clock",
                    "experiment": "_Experiment",
                    "gap_voltage_control": "_GapVoltageControl",
+                   "pll": "_PLLControl",
                    "piezo_control": "_PiezoControl",
                    "regulator": "_Regulator",
                    "view": "_View",
