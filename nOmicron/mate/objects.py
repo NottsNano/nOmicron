@@ -471,6 +471,12 @@ class _XYScanner(object):
         a = _process(p, [self, _inspect.stack()[0][3]], a, test)
         return a
 
+    def Speed_Adaption(self, a=None, test=0):
+        """Pick the speed adaption mode. 0 = constant line freq., 1 = constant scan speed"""
+        p = 'enum'
+        a = _process(p, [self, _inspect.stack()[0][3]], a, test)
+        return a
+
     def Enable_Execute_Port(self, a=None, test=False):
         """Set to True to return the probe to the position set by XYScanner.Store_Current_Position"""
         p = 'boolean'

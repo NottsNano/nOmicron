@@ -64,7 +64,7 @@ def set_points_lines(points=None, lines=None):
     mo.xy_scanner.Lines(lines)
 
 
-def set_scan_speed(scan=None, move=None):
+def set_scan_speed(scan=None, move=None, speed_adjust_mode="Frequency"):
     """
     Sets the scan and move t-raster elements
 
@@ -74,6 +74,9 @@ def set_scan_speed(scan=None, move=None):
         Time span between two adjacent raster points, in seconds
     move : float or None
         Time span between movements of the y scan, in seconds
+    speed_adjust_mode : str
+        The adaption method to keep constant when changing the adjust the scan raster/speed time.
+        Must be either ["Frequency", "Speed"]. Default is "Frequency".
 
     Examples
     --------
@@ -86,6 +89,11 @@ def set_scan_speed(scan=None, move=None):
     Set points and lines to different amounts
     >>> set_scan_speed(110e-3, 130e-3)
     """
+    speed_modes = {"Frequency": 1, "Speed": 2}
+    if speed_adjust_mode not in speed_modes.values():
+        raise ValueError(f"Must be one of {speed_modes.values()}")
+    mo.xy_scanner.Speed_Adaption(speed_modes[speed_adjust_mode])
+
     mo.xy_scanner.Move_Raster_Time_Constrained(True)
     if scan != move:
         if scan is not None and move is not None:
