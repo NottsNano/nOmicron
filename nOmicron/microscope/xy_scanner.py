@@ -136,6 +136,12 @@ def get_xy_scan(channel_name, x_direction, y_direction, num_lines='all', mode='n
     >>> xydata = get_xy_scan("Z", x_direction="Forward", y_direction="Up-Down")
     >>> plot_xy(xydata, pixel_scale=mo.xy_scanner.Width() * 1e9 / mo.xy_scanner.Points())
     >>> IO.disconnect()
+
+    Warnings
+    --------
+    Quite often (but unreliably!), running this function will get Matrix into a state in which it will return one/two
+    lines (unless play/pause is clicked manually) when operating manually. To restore this functionality, run
+    utils.utils.restore_z_functionality() and restart your scan.
     """
     global line_count, view_count, xydata
 

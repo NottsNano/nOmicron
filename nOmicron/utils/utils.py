@@ -159,4 +159,3 @@ def read_min_max(experiment_element, parameter, test=0):
 def restore_z_functionality():
     mo.xy_scanner.X_Trace_Trigger(False)
     mo.experiment.stop()
-    mo.experiment.start()
