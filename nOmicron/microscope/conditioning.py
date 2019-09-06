@@ -4,7 +4,7 @@ import numpy as np
 from nOmicron.mate import objects as mo
 
 
-def tip_pulse(voltage, time, num_pulses=1, pos=None, feedback_loop=True):
+def tip_pulse(voltage, time, num_pulses=1, pos=None, feedback_loop=False):
     """
     Performs a tip voltage pulse.
 

@@ -114,11 +114,12 @@ def get_xy_scan(channel_name, x_direction, y_direction, num_lines='all', mode='n
     channel_name : str
         The channel to acquire from, e.g. Z, I, Aux1, Aux2
     x_direction : str
-        Must be one of 'Forward' or 'Back'. 'Back' is currently not tested
+        Must be one of 'Forward', 'Backward', or 'Forward-Backward'
     y_direction : str
         Must be one of 'Up' or 'Up-Down'
     num_lines : int or str
         Number of lines to get. If an int, must be less than the number of lines in the scanner window.
+        Default is 'all'
     mode : str, optional
         Must be one of ['new', 'pause', 'continue']. Default is 'new'
     return_filename : bool, optional
@@ -126,7 +127,9 @@ def get_xy_scan(channel_name, x_direction, y_direction, num_lines='all', mode='n
 
     Returns
     -------
-    xydata : numpy array if y_direction == "Up", list of two numpy arrays if y_direction == "Down"
+    xydata : ndarray
+        Max 4 dimensions (y_up/y_down, x_up/x_down, x, y). First two dimensions will only appear if
+        y_direction is "Up-Down" and x_direction is "Forward-Backward" - will be missing as appropriate
 
     Examples
     --------
@@ -143,8 +146,9 @@ def get_xy_scan(channel_name, x_direction, y_direction, num_lines='all', mode='n
     lines (unless play/pause is clicked manually) when operating manually. To restore this functionality, run
     utils.utils.restore_z_functionality() and restart your scan.
     """
-    global line_count, view_count, xydata
+    global scan_dir_x, scan_dir_y, line_count_y, view_count, tot_packets, xydata
 
+    # Setup and parsing parameters
     allowed = ["new", "pause", "continue"]
     if mode not in allowed:
         raise ValueError(f"Mode must be one of {allowed}")
@@ -152,48 +156,57 @@ def get_xy_scan(channel_name, x_direction, y_direction, num_lines='all', mode='n
     if num_lines == 'all':
         num_lines = mo.xy_scanner.Lines()
 
-    xydata = np.zeros((2, num_lines, mo.xy_scanner.Points()))
-    xydata[:] = np.nan
+    x_dir_dict = {"Forward": "Fw",
+                  "Backward": "Bw"}
+    x_direction_strings = [x_dir_dict[x_dir] for x_dir in x_direction.split("-")]
+    y_direction_strings = y_direction.split("-")
 
-    lines_per = num_lines
+    # Set triggers
+    if x_direction == "Forward-Backward":
+        mo.xy_scanner.X_Retrace(True)
+    else:
+        mo.xy_scanner.X_Retrace(False)
+
     if y_direction == "Up-Down":
         if num_lines != 'all' and num_lines != mo.xy_scanner.Lines():  # Force set lines instead?
             raise ValueError("If scanning in both directions, num_lines cannot be set")
-        num_lines = num_lines * 2
         mo.xy_scanner.Y_Retrace(True)
     else:
         mo.xy_scanner.Y_Retrace(False)
 
-    if x_direction != "Forward":
-        mo.xy_scanner.X_Retrace(True)
-        # raise NotImplementedError
-    else:
-        mo.xy_scanner.X_Retrace(False)
-
+    # Set counters and pre-allocate
     view_count = [None, None]
-    line_count = 0
-    dir_dict = {"Forward": "Fw",
-                "Backward": "Bw"}
+    scan_dir_y = 0
+    scan_dir_x = 1
+    line_count_y = 0
+    tot_packets = 0
+    xydata = np.zeros((2, 2, num_lines, mo.xy_scanner.Points()))
+    xydata[:] = np.nan
 
     def view_xy_callback():
-        global line_count, view_count, xydata
-        line_count += 1
-        pbar.update(1)
-        if mo.view.Packet_Count() != line_count:
-            warnings.warn("Not all lines delivered in time. Matrix may be unstable.")
+        global scan_dir_x, scan_dir_y, line_count_y, view_count, tot_packets, xydata
+        tot_packets += 1
+        line_count_y += 1
+        if x_direction == "Forward-Backward":
+            scan_dir_x = int(not (bool(scan_dir_x)))
+            line_count_y = line_count_y - scan_dir_x
+        scan_dir_y = (line_count_y - 1) // mo.xy_scanner.Lines()
 
         data_size = mo.view.Data_Size()
-        scan_dir = (line_count - 1) // mo.xy_scanner.Lines()
-        test = np.array(mo.sample_data(data_size))
-        xydata[scan_dir, (line_count - lines_per * scan_dir) - 1, :] = test
+        data_pts = np.array(mo.sample_data(data_size))
+
+        xydata[scan_dir_y, int(not (bool(scan_dir_x))), (line_count_y - (num_lines * scan_dir_y)) - 1, :] = data_pts
         view_count = [mo.view.Run_Count(), mo.view.Cycle_Count()]
+
+        pbar.update(1)
         mo.xy_scanner.resume()
 
-    IO.enable_channel(f"{channel_name}_{dir_dict[x_direction]}")
-    mo.xy_scanner.X_Retrace(False)
-    mo.xy_scanner.X_Trace_Trigger(True)
-    mo.view.Data(view_xy_callback)
-    mo.allocate_sample_memory(mo.xy_scanner.Points())
+    # Enable channels
+    for x_direction_string in x_direction_strings:
+        IO.enable_channel(f"{channel_name}_{x_direction_string}")
+        mo.view.Data(view_xy_callback)
+        mo.allocate_sample_memory(mo.xy_scanner.Points())
+
     if mode == 'new':
         mo.experiment.start()
     elif mode == 'pause':
@@ -201,8 +214,10 @@ def get_xy_scan(channel_name, x_direction, y_direction, num_lines='all', mode='n
     else:
         pass
 
-    pbar = tqdm(total=num_lines)
-    while line_count < num_lines and mo.mate.rc == mo.mate.rcs['RMT_SUCCESS']:
+    # Get the data
+    pbar = tqdm(total=num_lines * len(x_direction_strings) * len(y_direction_strings))
+    while tot_packets < num_lines * len(x_direction_strings) * len(y_direction_strings) \
+            and mo.mate.rc == mo.mate.rcs['RMT_SUCCESS']:
         mo.wait_for_event()
 
     if mode == 'new':
@@ -212,14 +227,15 @@ def get_xy_scan(channel_name, x_direction, y_direction, num_lines='all', mode='n
     else:
         pass
 
-    IO.disable_channel()
+    # Pretty the output to make physical sense
+    xydata = np.flip(xydata, axis=2)
+    if len(x_direction_strings) != 2:
+        xydata = xydata[:, 0, :, :]
+    if len(y_direction_strings) != 2:
+        xydata = xydata[0, :, :, :]
+    np.squeeze(xydata)
 
-    xydata[0, :, :] = np.flipud(xydata[0, :, :])
-    if y_direction == "Up":
-        xydata = xydata[0, :, :]
-    else:
-        xydata = list(xydata)
-
+    # Return nicely
     if return_filename:
         filename = f"{mo.experiment.Result_File_Path()}\\{mo.experiment.Result_File_Name()}--{view_count[0]}_{view_count[1]}.Z_mtrx"
         return xydata, filename
