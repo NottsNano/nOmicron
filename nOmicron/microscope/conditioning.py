@@ -70,8 +70,12 @@ def tip_crash(delta_z, pos=None, delay=0, slew_rate=None):
         The position in normalised co-ordinate range(-1, 1) to perform the crash at.
         If None (default), do it in place
     delay : float
-        The time to continuously sample Z position before doing the crash. The average value is used as the start
-        position to calculate delta_z from. Default is 0
+        If pos is a tuple, this is the time to continuously sample Z position for before
+        doing the crash. The average value is used as the start position to calculate delta_z from.
+
+        If pos is None, this is the time the tip is left in the surface.
+
+        Default is 0
     slew_rate : float or None
         The slew rate in metres/second. Not enabled in None (default)
 
@@ -102,6 +106,7 @@ def tip_crash(delta_z, pos=None, delay=0, slew_rate=None):
     else:
         mo.regulator.Feedback_Loop_Enabled(False)
         mo.regulator.Z_Offset(-delta_z)
+        sleep(delay)
         mo.regulator.Feedback_Loop_Enabled(True)
 
     mo.experiment.resume()
