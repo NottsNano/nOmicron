@@ -58,7 +58,7 @@ def tip_pulse(voltage, time, num_pulses=1, pos=None, feedback_loop=False):
             sleep(0.01)
 
 
-def tip_crash(delta_z, pos=(-1, -1), delay=0, slew_rate=None):
+def tip_crash(delta_z, pos=None, delay=0, slew_rate=None):
     """
     Performs a controlled tip indendation.
 
@@ -66,9 +66,9 @@ def tip_crash(delta_z, pos=(-1, -1), delay=0, slew_rate=None):
     ----------
     delta_z : float
         The depth to ramp in meters.
-    pos : tuple
+    pos : tuple or None
         The position in normalised co-ordinate range(-1, 1) to perform the crash at.
-        Default is (-1, -1), which corresponds to the bottom left corner of the scan window
+        If None (default), do it in place
     delay : float
         The time to continuously sample Z position before doing the crash. The average value is used as the start
         position to calculate delta_z from. Default is 0
@@ -87,17 +87,23 @@ def tip_crash(delta_z, pos=(-1, -1), delay=0, slew_rate=None):
     mo.regulator.Z_Ramp(-delta_z)
 
     mo.experiment.pause()
-    mo.xy_scanner.Execute_Port_Colour("ZRamp")
-    mo.xy_scanner.Store_Current_Position(True)
-    mo.xy_scanner.Target_Position(pos)
-    mo.xy_scanner.Trigger_Execute_At_Target_Position(True)
+    if pos is not None:
+        mo.xy_scanner.Execute_Port_Colour("ZRamp")
+        mo.xy_scanner.Store_Current_Position(True)
+        mo.xy_scanner.Target_Position(pos)
+        mo.xy_scanner.Trigger_Execute_At_Target_Position(True)
 
-    mo.xy_scanner.move()
+        mo.xy_scanner.move()
 
-    mo.xy_scanner.Trigger_Execute_At_Target_Position(False)
-    mo.xy_scanner.Return_To_Stored_Position(True)
-    mo.xy_scanner.Store_Current_Position(False)
-    mo.xy_scanner.Execute_Port_Colour("")
+        mo.xy_scanner.Trigger_Execute_At_Target_Position(False)
+        mo.xy_scanner.Return_To_Stored_Position(True)
+        mo.xy_scanner.Store_Current_Position(False)
+        mo.xy_scanner.Execute_Port_Colour("")
+    else:
+        mo.regulator.Feedback_Loop_Enabled(False)
+        mo.regulator.Z_Offset(-delta_z)
+        mo.regulator.Feedback_Loop_Enabled(True)
+
     mo.experiment.resume()
 
 
