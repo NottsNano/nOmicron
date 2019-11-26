@@ -285,6 +285,7 @@ class MATE(object):
         bin_sub_path = 'Bin\\Matrix.exe'
         library_sub_path = 'SDK\\RemoteAccess\\RemoteAccess_API.dll'
         name = os.path.basename(bin_sub_path)
+
         ok = False
         ps = psutil.process_iter()
         p = next(ps)
@@ -298,6 +299,7 @@ class MATE(object):
                 p_name = ''
             if p_name == name:
                 installation_directory = p_path[:-(len(bin_sub_path) + 1)]
+                self.installation_directory = installation_directory
                 library_path = os.path.join(installation_directory,
                                             library_sub_path)
                 ok = os.path.exists(library_path)
