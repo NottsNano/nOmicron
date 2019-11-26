@@ -637,6 +637,12 @@ class _XYScanner(object):
 class _Spectroscopy:
     """Controls spectroscopy. Device 1&2 are the first two channels in the Matrix window (?)."""
 
+    def Enable_Subgrid(self, a=None, test=False):
+        """Enables grid spectroscopy mode"""
+        p = 'boolean'
+        a = _process(p, [self, _inspect.stack()[0][3]], a, test)
+        return a
+
     def Enable_Feedback_Loop(self, a=None, test=False):
         """Enable the feedback loop"""
         p = 'boolean'

@@ -6,6 +6,7 @@ import nOmicron.mate.objects as mo
 from nOmicron.microscope import IO
 from tqdm import tqdm
 
+
 def get_continuous_signal(channel_name, sample_time, sample_points):
     """Acquire a continuous signal.
 
@@ -73,7 +74,7 @@ def get_continuous_signal(channel_name, sample_time, sample_points):
     return x_data, y_data
 
 
-def get_point_spectra(channel_name, target_position, start_end, sample_time, sample_points,
+def get_point_spectra(channel_name, target_position, start_end, sample_time, sample_points, grid_pts=None,
                       repeats=1, forward_back=True, return_filename=False):
     """
     Go to a position and perform fixed point spectroscopy.
@@ -92,6 +93,9 @@ def get_point_spectra(channel_name, target_position, start_end, sample_time, sam
         The number of points to acquire
     repeats : int
         The number of repeat spectra to take for each point
+    grid_pts : tuple of int
+        The number of points to do grid spectroscopy on. Default None (i.e. off).
+        "repeats" cannot be set simultaneously.
     forward_back : bool
         Scan in both directions, or just one.
     return_filename : bool, optional
@@ -121,6 +125,15 @@ def get_point_spectra(channel_name, target_position, start_end, sample_time, sam
     """
 
     global view_count, view_name, x_data, y_data
+    if repeats == 1 and grid_pts is not None:
+        raise ValueError("MATRIX does not support multiple repeats with grid spectroscopy")
+
+    if grid_pts is not None:
+        mo.spectroscopy.Enable_Subgrid(True)
+        repeats = (forward_back + 1) * grid_pts[0] * grid_pts[1]
+    else:
+        mo.spectroscopy.Enable_Subgrid(False)
+
     modes = {"V": 0, "Z": 1, "Varied Z": 2}  # Varied Z not fully supported yet!
     max_count = (repeats * (forward_back + 1))
     view_count = 0
@@ -137,7 +150,7 @@ def get_point_spectra(channel_name, target_position, start_end, sample_time, sam
         packet_count = mo.view.Packet_Count() - 1
         data_size = mo.view.Data_Size()
         x_data = np.linspace(start_end[0], start_end[1], data_size)
-        y_data[cycle_count][packet_count] = np.array(mo.sample_data(data_size))*1e-9
+        y_data[cycle_count][packet_count] = np.array(mo.sample_data(data_size)) * 1e-9
         if packet_count == 1:
             y_data[cycle_count][packet_count] = np.flip(y_data[cycle_count][packet_count])
 
@@ -186,6 +199,7 @@ def get_point_spectra(channel_name, target_position, start_end, sample_time, sam
 
 if __name__ == '__main__':
     from nOmicron.utils.plotting import plot_linear_signal
+
     IO.connect()
     t, I1 = get_continuous_signal("I(t)", sample_time=5, sample_points=50)
 
