@@ -471,6 +471,12 @@ class _XYScanner(object):
         a = _process(p, [self, _inspect.stack()[0][3]], a, test)
         return a
 
+    def Subgrid_Enabled(self, a=None, test=0):
+        """Here be dragons again"""
+        p = 'enum'
+        a = _process(p, [self, _inspect.stack()[0][3]], a, test)
+        return a
+
     def Speed_Adaption(self, a=None, test=0):
         """Pick the speed adaption mode. 0 = constant line freq., 1 = constant scan speed"""
         p = 'enum'
@@ -634,12 +640,35 @@ class _XYScanner(object):
         out = _process(p, [self, _inspect.stack()[0][3]], None)
 
 
+
+
 class _Spectroscopy:
     """Controls spectroscopy. Device 1&2 are the first two channels in the Matrix window (?)."""
 
     def Enable_Subgrid(self, a=None, test=False):
         """Enables grid spectroscopy mode"""
         p = 'boolean'
+        a = _process(p, [self, _inspect.stack()[0][3]], a, test)
+        return a
+
+    def Subgrid_Match_Mode(self, a=None, test=0):
+        """Pick the direction to base grid spec on.
+         0->Fwd_Bwd, 1->Fwd, 2->Bwd"""
+        p = 'enum'
+        a = _process(p, [self, _inspect.stack()[0][3]], a, test)
+        return a
+
+    def Subgrid_X(self, a=None, test=0):
+        """Integer describing number of X subgrid points"""
+        p = 'unsigned_integer'
+        is_parameter_allowable(a, self.__class__.__name__, _inspect.stack()[0][3], test)
+        a = _process(p, [self, _inspect.stack()[0][3]], a, test)
+        return a
+
+    def Subgrid_Y(self, a=None, test=0):
+        """Integer describing number of Y subgrid points"""
+        p = 'unsigned_integer'
+        is_parameter_allowable(a, self.__class__.__name__, _inspect.stack()[0][3], test)
         a = _process(p, [self, _inspect.stack()[0][3]], a, test)
         return a
 

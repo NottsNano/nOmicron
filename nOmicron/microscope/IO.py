@@ -32,7 +32,6 @@ def enable_channel(channel_name):
     """
 
     channel_name = channel_name.replace("(", "_").replace(")","")
-
     if channel_name[-1] == "w":
         utils.is_channel_real(channel_name[:-3])
     else:
@@ -48,9 +47,15 @@ def enable_channel(channel_name):
     mo.view.Deliver_Data(True)
 
 
-def disable_channel():
+def disable_channel(channel_name=None):
     """Disables a channel from passing data."""
-    if mo.channel_name == '':
+    if channel_name:
+        channel_name = channel_name.replace("(", "_").replace(")", "")
+        if channel_name[-1] == "t":
+            mo.channel_name = channel_name.replace("(", "_").replace(")","")
+            mo.get_clock_name(mo.channel_name)
+            mo.clock.Enable(False)
+    elif mo.channel_name == '':
         raise IOError("No channel to disable")
 
     mo.view.Deliver_Data(False)
