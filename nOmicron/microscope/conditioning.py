@@ -19,7 +19,7 @@ def tip_pulse(voltage, time, num_pulses=1, pos=None, feedback_loop=False):
     pos : None or tuple
         The position to do the pulse at, in normalised co-ords. If None, do it at the current tip position
     feedback_loop : bool
-        If the feedback loop is on or not. Default True
+        If the feedback loop is on or not. Default False
     """
 
     mo.xy_scanner.Execute_Port_Colour("VPulse")
@@ -27,10 +27,9 @@ def tip_pulse(voltage, time, num_pulses=1, pos=None, feedback_loop=False):
         mo.gap_voltage_control.Tip_Cond_Pulse_Preamp_Range(1)
     else:
         mo.gap_voltage_control.Tip_Cond_Pulse_Preamp_Range(0)
-    mo.gap_voltage_control.Tip_Cond_Enable_Feedback_Loop(True)
 
-    if not feedback_loop:
-        mo.gap_voltage_control.Tip_Cond_Enable_Feedback_Loop(False)
+    old_feedback_loop = mo.regulator.Feedback_Loop_Enabled()
+    mo.regulator.Feedback_Loop_Enabled(feedback_loop)
 
     mo.gap_voltage_control.Tip_Cond_Pulse_Time(time)
     mo.gap_voltage_control.Tip_Cond_Pulse_Voltage(voltage)
@@ -55,10 +54,12 @@ def tip_pulse(voltage, time, num_pulses=1, pos=None, feedback_loop=False):
             mo.gap_voltage_control.Voltage(voltage)
             sleep(time)
             mo.gap_voltage_control.Voltage(old_voltage)
-            sleep(0.01)
+            # sleep(0.01)
+
+    mo.regulator.Feedback_Loop_Enabled(old_feedback_loop)
 
 
-def tip_crash(delta_z, pos=None, delay=0, slew_rate=None):
+def tip_crash(delta_z, pos=(-1, -1), delay=0, slew_rate=None):
     """
     Performs a controlled tip indendation.
 
@@ -66,21 +67,18 @@ def tip_crash(delta_z, pos=None, delay=0, slew_rate=None):
     ----------
     delta_z : float
         The depth to ramp in meters.
-    pos : tuple or None
+    pos : tuple
         The position in normalised co-ordinate range(-1, 1) to perform the crash at.
-        If None (default), do it in place
+        Default is (-1, -1), which corresponds to the bottom left corner of the scan window
     delay : float
-        If pos is a tuple, this is the time to continuously sample Z position for before
-        doing the crash. The average value is used as the start position to calculate delta_z from.
-
-        If pos is None, this is the time the tip is left in the surface.
-
-        Default is 0
+        The time to continuously sample Z position before doing the crash. The average value is used as the start
+        position to calculate delta_z from. Default is 0
     slew_rate : float or None
         The slew rate in metres/second. Not enabled in None (default)
 
     """
     assert delta_z > 0, "delta_z must be positive"
+    # mo.experiment.pause()
     mo.xy_scanner.Execute_Port_Colour("ZRamp")
     mo.regulator.Enable_Z_Ramp_Slew_Rate(False)
     mo.regulator.Z_Ramp_Delay(delay)
@@ -90,26 +88,19 @@ def tip_crash(delta_z, pos=None, delay=0, slew_rate=None):
         mo.regulator.Z_Ramp_Slew_Rate(slew_rate)
     mo.regulator.Z_Ramp(-delta_z)
 
-    mo.experiment.pause()
-    if pos is not None:
-        mo.xy_scanner.Execute_Port_Colour("ZRamp")
-        mo.xy_scanner.Store_Current_Position(True)
-        mo.xy_scanner.Target_Position(pos)
-        mo.xy_scanner.Trigger_Execute_At_Target_Position(True)
+    mo.xy_scanner.Execute_Port_Colour("ZRamp")
+    mo.xy_scanner.Store_Current_Position(True)
+    mo.xy_scanner.Target_Position(pos)
+    mo.xy_scanner.Trigger_Execute_At_Target_Position(True)
 
-        mo.xy_scanner.move()
+    mo.xy_scanner.move()
 
-        mo.xy_scanner.Trigger_Execute_At_Target_Position(False)
-        mo.xy_scanner.Return_To_Stored_Position(True)
-        mo.xy_scanner.Store_Current_Position(False)
-        mo.xy_scanner.Execute_Port_Colour("")
-    else:
-        mo.regulator.Feedback_Loop_Enabled(False)
-        mo.regulator.Z_Offset(-delta_z)
-        sleep(delay)
-        mo.regulator.Feedback_Loop_Enabled(True)
-
-    mo.experiment.resume()
+    mo.xy_scanner.Trigger_Execute_At_Target_Position(False)
+    mo.xy_scanner.Return_To_Stored_Position(True)
+    mo.xy_scanner.Store_Current_Position(False)
+    mo.xy_scanner.Target_Position()
+    mo.xy_scanner.Execute_Port_Colour("")
+    # mo.experiment.resume()
 
 
 def tip_scratch(delta_z, end_pos, start_pos=None):

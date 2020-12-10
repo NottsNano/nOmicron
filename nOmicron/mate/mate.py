@@ -10,6 +10,7 @@ import xml.etree.ElementTree as ET
 
 import pefile
 import psutil
+from natsort import natsort
 
 
 class MATE(object):
@@ -285,7 +286,6 @@ class MATE(object):
         bin_sub_path = 'Bin\\Matrix.exe'
         library_sub_path = 'SDK\\RemoteAccess\\RemoteAccess_API.dll'
         name = os.path.basename(bin_sub_path)
-
         ok = False
         ps = psutil.process_iter()
         p = next(ps)
@@ -299,7 +299,6 @@ class MATE(object):
                 p_name = ''
             if p_name == name:
                 installation_directory = p_path[:-(len(bin_sub_path) + 1)]
-                self.installation_directory = installation_directory
                 library_path = os.path.join(installation_directory,
                                             library_sub_path)
                 ok = os.path.exists(library_path)
@@ -330,8 +329,9 @@ class MATE(object):
                         co = st_entries[0].entries[b'CompanyName'].decode()
                 pe.close()
         if co:
-            exp_sub_path = 'MATRIX\\default\\Experiments'
             user_config_dir = os.environ['APPDATA']
+            all_default_paths = natsort.natsorted(os.listdir(f"{user_config_dir}\\{co}\\MATRIX"))
+            exp_sub_path = f'MATRIX\\{all_default_paths[-1]}\\Experiments'
             self.experiments_directory = os.path.join(user_config_dir, co,
                                                       exp_sub_path)
             self.lib_mate = ctypes.cdll.LoadLibrary(library_path)

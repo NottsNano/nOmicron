@@ -2,19 +2,20 @@
 
 import warnings
 
-import numpy as np
-from tqdm import tqdm
-
 import nOmicron.mate.objects as mo
+import numpy as np
 from nOmicron.microscope import IO
 from nOmicron.utils.plotting import plot_xy
-
+from tqdm.auto import tqdm
+from time import sleep
 
 def set_gap_voltage(voltage):
     mo.gap_voltage_control.Voltage(voltage)
 
 
 def set_scan_position(xy_pos=None, width_height=None, angle=None):
+    mo.xy_scanner.Enable_Scan(False)
+
     if width_height[0] != width_height[1]:
         mo.xy_scanner.Width_Height_Constrained(False)
 
@@ -28,6 +29,8 @@ def set_scan_position(xy_pos=None, width_height=None, angle=None):
 
     if angle is not None:
         mo.xy_scanner.Angle(angle)
+
+    mo.xy_scanner.Enable_Scan(True)
 
 
 def set_points_lines(points=None, lines=None):
@@ -174,6 +177,10 @@ def get_xy_scan(channel_name, x_direction, y_direction, num_lines='all', mode='n
     else:
         mo.xy_scanner.Y_Retrace(False)
 
+    # while not mo.xy_scanner.Enable_Scan():  # Enforce that we won't take data during relocation and confuse the CU
+    #     print("waiting")
+    #     sleep(0.1)
+
     # Set counters and pre-allocate
     view_count = [None, None]
     scan_dir_y = 0
@@ -186,11 +193,12 @@ def get_xy_scan(channel_name, x_direction, y_direction, num_lines='all', mode='n
     def view_xy_callback():
         global scan_dir_x, scan_dir_y, line_count_y, view_count, tot_packets, xydata
         tot_packets += 1
+        mo.tot_packets = tot_packets
         line_count_y += 1
         if x_direction == "Forward-Backward":
             scan_dir_x = int(not (bool(scan_dir_x)))
             line_count_y = line_count_y - scan_dir_x
-        scan_dir_y = (line_count_y - 1) // mo.xy_scanner.Lines()
+        scan_dir_y = (line_count_y - 1) // num_lines
 
         data_size = mo.view.Data_Size()
         data_pts = np.array(mo.sample_data(data_size))
@@ -199,7 +207,9 @@ def get_xy_scan(channel_name, x_direction, y_direction, num_lines='all', mode='n
         view_count = [mo.view.Run_Count(), mo.view.Cycle_Count()]
 
         pbar.update(1)
-        mo.xy_scanner.resume()
+        # pbar.set_postfix({"Scanline": mo.view.Packet_Count()})
+        # if tot_packets % 2 == 1:
+        #     pbar.set_postfix({"Scanline": mo.view.Packet_Count()+1})
 
     # Enable channels
     for x_direction_string in x_direction_strings:
@@ -237,7 +247,7 @@ def get_xy_scan(channel_name, x_direction, y_direction, num_lines='all', mode='n
 
     # Return nicely
     if return_filename:
-        filename = f"{mo.experiment.Result_File_Path()}\\{mo.experiment.Result_File_Name()}--{view_count[0]}_{view_count[1]}.Z_mtrx"
+        filename = f"{mo.experiment.Result_File_Path()}\\{mo.experiment.Result_File_Name()}--{mo.view.Run_Count()}_{mo.view.Cycle_Count()}.Z_mtrx"
         return xydata, filename
     else:
         return xydata

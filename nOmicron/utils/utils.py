@@ -6,7 +6,7 @@ import sys
 import warnings
 
 import nOmicron.mate.objects as mo
-from bs4 import BeautifulSoup
+
 
 def is_online():
     """Tests if matrix is connected and running."""
@@ -27,7 +27,7 @@ def is_channel_real(channel_name):
     is_online()
     response = mo.mate.deployment_parameter(mo.mate.scope, channel_name, 'Trigger') == ''
     if response:
-        raise LookupError(f"'{channel_name}' does not exist/is not enabled. Allowed channels: {get_allowed_channels()}")
+        raise LookupError(f"Requested channel '{channel_name}' does not exist/is not enabled in Matrix")
 
     return not response
 
@@ -105,15 +105,17 @@ def is_parameter_allowable(value, experiment_element, parameter, test=0):
     >>> is_parameter_allowable(100, "xy_scanner", "Points")
 
     """
-    min_max = read_min_max(experiment_element, parameter, test)
-
-    if value is not None:
-        response = min_max[0] <= value <= min_max[1]
-        if not response:
-            warnings.warn(
-                f"{parameter} should be within range {min_max[0]} <= {parameter} <= {min_max[1]}. Matrix may die")
+    if value is None:
+        return True
     else:
-        response = None
+        min_max = read_min_max(experiment_element, parameter, test)
+        if min_max:
+            response = min_max[0] <= value <= min_max[1]
+            if not response:
+                warnings.warn(
+                    f"{parameter} ({value}) should be within range {min_max[0]} <= {parameter} <= {min_max[1]}. Matrix may die")
+        else:
+            response = None
     return response
 
 
@@ -161,18 +163,3 @@ def restore_z_functionality():
     mo.xy_scanner.X_Retrace_Trigger(False)
     mo.xy_scanner.Y_Retrace_Trigger(False)
     mo.experiment.stop()
-
-
-def get_allowed_channels():
-    experiment_name = mo.mate.scope
-    install_path = mo.mate.installation_directory
-    experiment_path = f"{install_path}\Templates\default\Experiments\{experiment_name}.expd"
-
-    experiment_file = open(experiment_path, "r").read()
-    soup = BeautifulSoup(experiment_file, "xml")
-
-    raw_entries = soup.findAll(panelType="ChannelControl")
-    allowed_channels = [line.attrs["experimentElementInstanceName"] for line in raw_entries]
-
-    return allowed_channels
-
