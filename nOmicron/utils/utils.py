@@ -5,7 +5,7 @@ import json
 import sys
 import warnings
 
-import nOmicron.mate.objects as mo
+from nOmicron.mate import objects as mo
 
 
 def is_online():
