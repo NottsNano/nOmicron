@@ -6,6 +6,7 @@ import sys
 import warnings
 
 from nOmicron.mate import objects as mo
+from bs4 import BeautifulSoup
 
 
 def is_online():
@@ -27,7 +28,7 @@ def is_channel_real(channel_name):
     is_online()
     response = mo.mate.deployment_parameter(mo.mate.scope, channel_name, 'Trigger') == ''
     if response:
-        raise LookupError(f"Requested channel '{channel_name}' does not exist/is not enabled in Matrix")
+        raise LookupError(f"'{channel_name}' does not exist/is not enabled. Allowed channels: {get_allowed_channels()}")
 
     return not response
 
@@ -163,3 +164,17 @@ def restore_z_functionality():
     mo.xy_scanner.X_Retrace_Trigger(False)
     mo.xy_scanner.Y_Retrace_Trigger(False)
     mo.experiment.stop()
+    
+
+def get_allowed_channels():
+    experiment_name = mo.mate.scope
+    install_path = mo.mate.installation_directory
+    experiment_path = f"{install_path}\Templates\default\Experiments\{experiment_name}.expd"
+
+    experiment_file = open(experiment_path, "r").read()
+    soup = BeautifulSoup(experiment_file, "xml")
+
+    raw_entries = soup.findAll(panelType="ChannelControl")
+    allowed_channels = [line.attrs["experimentElementInstanceName"] for line in raw_entries]
+
+    return allowed_channels
