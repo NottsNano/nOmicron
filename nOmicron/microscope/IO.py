@@ -1,8 +1,7 @@
 # Oliver Gordon, 2019
 
-import nOmicron.mate.objects as mo
+from nOmicron.mate import objects as mo
 from nOmicron.utils import utils
-import re
 
 def connect():
     """Connect to the Matrix. Matrix must be open and initalised."""

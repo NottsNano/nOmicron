@@ -8,6 +8,6 @@ MATE for Dummies. MATE Scripting System in Python
 
 __version__ = '1.0'
 
-__all__ = ['MATE']
+__all__ = ['MATE','objects']
 
 from .mate import *

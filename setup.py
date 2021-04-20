@@ -2,15 +2,15 @@ from setuptools import setup, find_packages
 
 setup(
     name='nOmicron',
-    version='1.3.0',
+    version='1.5.0',
     url='https://github.com/OGordon100/nOmicron',
     license='GPL v3.0',
     author='Oliver Gordon',
     author_email='oliver.gordon@nottingham.ac.uk',
-    description="Python Controls for Scienta Omicron Matrix",
-    long_description="nOmicron package/API for automatically control of Matrix through Python",
+    description="Python Control for Scienta Omicron Matrix",
+    long_description="nOmicron package/API to automatically control Matrix through Python",
     packages=find_packages(),
-    install_requires=['numpy', 'tqdm', 'matplotlib', 'natsort', 'psutil'],
+    install_requires=['numpy', 'tqdm', 'matplotlib', 'natsort', 'pefile', 'psutil', 'selenium', 'chromedriver_autoinstaller'],
     classifiers=[
         "Programming Language :: Python :: 3.6",
         "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",

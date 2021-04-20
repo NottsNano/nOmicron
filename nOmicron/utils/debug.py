@@ -1,7 +1,7 @@
 # Oliver Gordon, 2019
 
 import ctypes
-import nOmicron.mate.objects as mo
+from nOmicron.mate import objects as mo
 
 from nOmicron.microscope import IO
 

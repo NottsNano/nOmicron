@@ -6,7 +6,7 @@ import nOmicron.mate.objects as mo
 import numpy as np
 from nOmicron.microscope import IO
 from nOmicron.utils.plotting import plot_xy
-from tqdm.auto import tqdm
+from tqdm import tqdm
 from time import sleep
 
 def set_gap_voltage(voltage):
@@ -206,8 +206,8 @@ def get_xy_scan(channel_name, x_direction, y_direction, num_lines='all', mode='n
         xydata[scan_dir_y, int(not (bool(scan_dir_x))), (line_count_y - (num_lines * scan_dir_y)) - 1, :] = data_pts
         view_count = [mo.view.Run_Count(), mo.view.Cycle_Count()]
 
-        pbar.update(1)
-        # pbar.set_postfix({"Scanline": mo.view.Packet_Count()})
+        # pbar.update(1)
+        # # pbar.set_postfix({"Scanline": mo.view.Packet_Count()})
         # if tot_packets % 2 == 1:
         #     pbar.set_postfix({"Scanline": mo.view.Packet_Count()+1})
 
@@ -225,7 +225,7 @@ def get_xy_scan(channel_name, x_direction, y_direction, num_lines='all', mode='n
         pass
 
     # Get the data
-    pbar = tqdm(total=num_lines * len(x_direction_strings) * len(y_direction_strings))
+    # pbar = tqdm(total=num_lines * len(x_direction_strings) * len(y_direction_strings))
     while tot_packets < num_lines * len(x_direction_strings) * len(y_direction_strings) \
             and mo.mate.rc == mo.mate.rcs['RMT_SUCCESS']:
         mo.wait_for_event()

@@ -2,7 +2,7 @@
 
 import numpy as np
 
-import nOmicron.mate.objects as mo
+from nOmicron.mate import objects as mo
 from nOmicron.microscope import IO
 from tqdm import tqdm
 
