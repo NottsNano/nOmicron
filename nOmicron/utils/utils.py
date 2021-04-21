@@ -110,17 +110,15 @@ def is_parameter_allowable(value, experiment_element, parameter, test=0):
     >>> is_parameter_allowable(100, "xy_scanner", "Points")
 
     """
-    if type(value) is int:
-        value = float(value)
-
     if value is None:
         return True
     else:
         min_max = read_min_max(experiment_element, parameter, test)
-        if type(value) != type(min_max[0]):
-            raise MatrixInvalidDataTypeError
         if min_max:
-            response = min_max[0] <= value <= min_max[1]
+            try:
+                response = min_max[0] <= value <= min_max[1]
+            except:
+                raise MatrixInvalidDataTypeError
             if not response:
                 warnings.warn(
                     f"{parameter} ({value}) should be within range {min_max[0]} <= {parameter} <= {min_max[1]}. Matrix may die",

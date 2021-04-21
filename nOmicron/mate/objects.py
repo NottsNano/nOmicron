@@ -487,6 +487,14 @@ class _XYScanner(object):
         a = _process(p, [self, "Speed_Adaption"], a, test)
         return a
 
+    def Scan_Speed(self, a=None, test=0.0):
+        """Time in seconds to move between scanning points. Identical to XYScanner.Move_Raster_Time. Real value is
+        shown with Scan_Speed"""
+        p = 'double'
+        is_parameter_allowable(a, self.__class__.__name__, "Scan_Speed", test)
+        a = _process(p, [self, "Scan_Speed"], a, test)
+        return a
+
     def Enable_Execute_Port(self, a=None, test=False):
         """Set to True to return the probe to the position set by XYScanner.Store_Current_Position"""
         p = 'boolean'
