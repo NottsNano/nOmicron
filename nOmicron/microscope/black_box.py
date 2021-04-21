@@ -3,8 +3,11 @@ import chromedriver_autoinstaller
 from selenium.webdriver.chrome.options import Options
 import subprocess
 
+from nOmicron.utils.errors import MatrixUnsupportedOperationError
+
 if "Received = 1" not in subprocess.check_output("ping 10.0.42.2 -n 1", shell=True).decode("utf-8"):
-    raise SystemError("The black box remote system cannot be found. Check that http://10.0.42.2 loads")
+    raise MatrixUnsupportedOperationError("Remote black box control is unavailable in this hardware configuration. \n"
+                                          "Check that http://10.0.42.2 can be loaded")
 chromedriver_autoinstaller.install()
 
 options = Options()

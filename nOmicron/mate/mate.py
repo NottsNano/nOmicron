@@ -12,6 +12,8 @@ import pefile
 import psutil
 from natsort import natsort
 
+from nOmicron.utils import errors
+
 
 class MATE(object):
     class ValueType:
@@ -210,6 +212,7 @@ class MATE(object):
                                     self.rc_key(rc) + '.\n')
         else:
             out = p[0]
+        self.check_for_response_error(rc)
         return out, rc
 
     def deployment_parameter(self, scope, eei_name, dp_name):
@@ -281,6 +284,7 @@ class MATE(object):
             self.scope = ''
             self.log.AppendText('No open experiments found.\n')
             self.online = False
+        self.check_for_response_error(rc)
 
     def connect(self):
         bin_sub_path = 'Bin\\Matrix.exe'
@@ -301,6 +305,8 @@ class MATE(object):
                 installation_directory = p_path[:-(len(bin_sub_path) + 1)]
                 library_path = os.path.join(installation_directory,
                                             library_sub_path)
+                self.installation_directory = installation_directory
+                self.library_path = library_path
                 ok = os.path.exists(library_path)
             try:
                 p = next(ps)
@@ -331,10 +337,12 @@ class MATE(object):
         if co:
             user_config_dir = os.environ['APPDATA']
             all_default_paths = natsort.natsorted(os.listdir(f"{user_config_dir}\\{co}\\MATRIX"))
+            self.matrix_dir = all_default_paths[-1]
             exp_sub_path = f'MATRIX\\{all_default_paths[-1]}\\Experiments'
             self.experiments_directory = os.path.join(user_config_dir, co,
                                                       exp_sub_path)
             self.lib_mate = ctypes.cdll.LoadLibrary(library_path)
+            self.library_path = library_path
             self.lib_mate.setHost(b'localhost')
             self.disconnect()
             if self.is_ran_down or self.testmode:
@@ -354,6 +362,8 @@ class MATE(object):
             self.log.AppendText('Connecting to the MATRIX, response: '
                                 '---.\n')
 
+        self.check_for_response_error(self.rc)
+
     def disconnect(self):
         if not self.is_ran_down:
             rc = self.lib_mate.rundown()
@@ -362,3 +372,28 @@ class MATE(object):
             self.is_ran_down = (rc == self.rcs['RMT_SUCCESS'])
             self.online = False
             self.rc = rc
+
+            self.check_for_response_error(self.rc)
+
+    def check_for_response_error(self, rc):
+        rc_key = self.rc_key(rc)
+        print(rc_key)
+
+        if rc_key == "RMT_UNEXPECTEDRESPONSE":
+            raise errors.MatrixUnexpectedResponseError
+        elif rc_key == "RMT_LIBNOTLOADABLE":
+            raise errors.MateLibNotLoadableError
+        elif rc_key == "RMT_INTERNALFAILURE":
+            raise errors.MatrixCriticalHardwareFailureError
+        elif rc_key == "RMT_NOSERVER":
+            raise errors.MatrixNotInitialisedError
+        elif rc_key == "RMT_INCOMPATIBLEPROTOCOL":
+            raise errors.MatrixIncompatibleProtocolError
+        elif rc_key == "RMT_UNSUPPORTEDREQ":
+            raise errors.MatrixUnsupportedReqError
+        elif rc_key in ["RMT_UNKNOWNOBJECT", "RMT_UNKNOWNPROPERTY"]:
+            raise errors.MatrixUnsupportedOperationError
+        elif rc_key == "RMT_INVALIDTYPE":
+            raise errors.MatrixInvalidDataTypeError
+        elif rc_key == "RMT_REJECTED":
+            raise errors.MatrixRejectedError

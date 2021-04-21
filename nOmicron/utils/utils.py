@@ -5,13 +5,17 @@ import json
 import sys
 import warnings
 
+from bs4 import BeautifulSoup
+
 from nOmicron.mate import objects as mo
+from nOmicron.utils.errors import MatrixNotInitialisedError, MatrixParameterOutOfRangeWarning, \
+    MatrixUnsupportedOperationError, MatrixInvalidDataTypeError
 
 
 def is_online():
     """Tests if matrix is connected and running."""
     if not mo.mate.online or mo.experiment.Result_File_Name() == 'void':
-        raise ConnectionError("Matrix is not running and initialised!")
+        raise MatrixNotInitialisedError()
     return mo.mate.online
 
 
@@ -21,14 +25,15 @@ def is_channel_real(channel_name):
     Parameters
     ----------
     channel_name : str
+    channel_name : str
         The name of the channel
     """
 
     is_online()
     response = mo.mate.deployment_parameter(mo.mate.scope, channel_name, 'Trigger') == ''
     if response:
-        raise LookupError(f"Requested channel '{channel_name}' does not exist/is not enabled in Matrix")
-
+        raise MatrixUnsupportedOperationError(f"Requested channel '{channel_name}' is not available in this \n"
+                                              f"experiment. Available channels = {get_allowed_channels()}")
     return not response
 
 
@@ -109,11 +114,14 @@ def is_parameter_allowable(value, experiment_element, parameter, test=0):
         return True
     else:
         min_max = read_min_max(experiment_element, parameter, test)
+        if type(value) != type(min_max[0]):
+            raise MatrixInvalidDataTypeError
         if min_max:
             response = min_max[0] <= value <= min_max[1]
             if not response:
                 warnings.warn(
-                    f"{parameter} ({value}) should be within range {min_max[0]} <= {parameter} <= {min_max[1]}. Matrix may die")
+                    f"{parameter} ({value}) should be within range {min_max[0]} <= {parameter} <= {min_max[1]}. Matrix may die",
+                    MatrixParameterOutOfRangeWarning)
         else:
             response = None
     return response
@@ -163,3 +171,17 @@ def restore_z_functionality():
     mo.xy_scanner.X_Retrace_Trigger(False)
     mo.xy_scanner.Y_Retrace_Trigger(False)
     mo.experiment.stop()
+
+
+def get_allowed_channels():
+    experiment_name = mo.mate.scope
+    install_path = mo.mate.installation_directory
+    experiment_path = f"{install_path}\Templates\default\Experiments\{experiment_name}.expd"
+
+    experiment_file = open(experiment_path, "r").read()
+    soup = BeautifulSoup(experiment_file, "xml")
+
+    raw_entries = soup.findAll(panelType="ChannelControl")
+    allowed_channels = [line.attrs["experimentElementInstanceName"] for line in raw_entries]
+
+    return allowed_channels

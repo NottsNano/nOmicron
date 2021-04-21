@@ -12,6 +12,7 @@ from time import sleep
 from nOmicron.utils.utils import is_parameter_allowable
 
 from .mate import MATE as _MATE
+from ..utils.errors import MatrixNotInitialisedError
 
 
 class _Text(object):
@@ -912,7 +913,7 @@ class _PLLControl(object):
 def _process(p, caller, a, *args, **kwargs):
     global event_objects, _test_event_object
     if not hasattr(mate, "lib_mate"):
-        raise IOError("Matrix is not connected. Make sure you run IO.connect()")
+        raise MatrixNotInitialisedError()
 
     if caller[0].__class__.__name__ == '_Experiment':
         obj = mate.scope + '.' + caller[1]
