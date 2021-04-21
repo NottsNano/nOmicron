@@ -377,7 +377,6 @@ class MATE(object):
 
     def check_for_response_error(self, rc):
         rc_key = self.rc_key(rc)
-        print(rc_key)
 
         if rc_key == "RMT_UNEXPECTEDRESPONSE":
             raise errors.MatrixUnexpectedResponseError

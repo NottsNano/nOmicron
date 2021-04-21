@@ -110,6 +110,9 @@ def is_parameter_allowable(value, experiment_element, parameter, test=0):
     >>> is_parameter_allowable(100, "xy_scanner", "Points")
 
     """
+    if type(value) is int:
+        value = float(value)
+
     if value is None:
         return True
     else:
