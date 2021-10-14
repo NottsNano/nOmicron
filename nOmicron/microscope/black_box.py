@@ -80,4 +80,5 @@ def forward():
 
 def auto_approach():
     _press_button("AUTO")
+    sleep(0.5)  # Can take a second for the screen to update!!!
     _wait_for_approach()
