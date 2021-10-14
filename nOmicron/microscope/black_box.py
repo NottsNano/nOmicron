@@ -1,6 +1,7 @@
 import subprocess
 from time import sleep
 
+import backoff
 import requests
 from bs4 import BeautifulSoup
 
@@ -13,6 +14,8 @@ if "Received = 1" not in subprocess.check_output(f"ping {BLACK_BOX_IP} -n 1", sh
                                           f"Check that {BLACK_BOX_IP} can be loaded")
 
 
+@backoff.on_exception(backoff.expo,
+                      requests.exceptions.RequestException)
 def _wait_for_approach():
     while True:
         output = requests.get(f"http://{BLACK_BOX_IP}")
@@ -25,6 +28,8 @@ def _wait_for_approach():
             sleep(0.5)
 
 
+@backoff.on_exception(backoff.expo,
+                      requests.exceptions.RequestException)
 def _press_button(button_name):
     requests.get(f"http://{BLACK_BOX_IP}?{button_name}={button_name}")
 
