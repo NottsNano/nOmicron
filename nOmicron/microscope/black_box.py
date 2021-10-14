@@ -1,5 +1,8 @@
 import subprocess
-from urllib import request
+from time import sleep
+
+import requests
+from bs4 import BeautifulSoup
 
 from nOmicron.utils.errors import MatrixUnsupportedOperationError
 
@@ -10,8 +13,20 @@ if "Received = 1" not in subprocess.check_output(f"ping {BLACK_BOX_IP} -n 1", sh
                                           f"Check that {BLACK_BOX_IP} can be loaded")
 
 
+def _wait_for_approach():
+    while True:
+        output = requests.get(f"http://{BLACK_BOX_IP}")
+        soup = BeautifulSoup(output.text, 'html.parser')
+        display_text = soup.find("textarea")
+
+        if "ANY KEY STOPS" not in display_text.contents[0]:
+            break
+        else:
+            sleep(0.5)
+
+
 def _press_button(button_name):
-    request.urlopen(f"{BLACK_BOX_IP}?{button_name}={button_name}")
+    requests.get(f"http://{BLACK_BOX_IP}?{button_name}={button_name}")
 
 
 def x_plus():
@@ -60,3 +75,4 @@ def forward():
 
 def auto_approach():
     _press_button("AUTO")
+    _wait_for_approach()
