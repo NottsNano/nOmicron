@@ -1,68 +1,62 @@
-from selenium import webdriver
-import chromedriver_autoinstaller
-from selenium.webdriver.chrome.options import Options
 import subprocess
+from urllib import request
 
 from nOmicron.utils.errors import MatrixUnsupportedOperationError
 
-if "Received = 1" not in subprocess.check_output("ping 10.0.42.2 -n 1", shell=True).decode("utf-8"):
-    raise MatrixUnsupportedOperationError("Remote black box control is unavailable in this hardware configuration. \n"
-                                          "Check that http://10.0.42.2 can be loaded")
-chromedriver_autoinstaller.install()
+BLACK_BOX_IP = "10.0.42.2"
 
-options = Options()
-options.add_argument("--headless")
-driver = webdriver.Chrome(options=options)
-driver.get("http://10.0.42.2/")
+if "Received = 1" not in subprocess.check_output(f"ping {BLACK_BOX_IP} -n 1", shell=True).decode("utf-8"):
+    raise MatrixUnsupportedOperationError("Remote black box control is unavailable in this hardware configuration. \n"
+                                          f"Check that {BLACK_BOX_IP} can be loaded")
+
+
+def _press_button(button_name):
+    request.urlopen(f"{BLACK_BOX_IP}?{button_name}={button_name}")
 
 
 def x_plus():
-    driver.find_element_by_name("F1p").click()
+    _press_button("F1p")
 
 
 def x_minus():
-    driver.find_element_by_name("F1m").click()
+    _press_button("F1m")
 
 
 def y_plus():
-    driver.find_element_by_name("F2p").click()
+    _press_button("F2p")
 
 
 def y_minus():
-    driver.find_element_by_name("F2m").click()
+    _press_button("F2m")
 
 
 def z_plus():
-    driver.find_element_by_name("F3p").click()
+    _press_button("F3p")
 
 
 def z_minus():
-    driver.find_element_by_name("F3m").click()
+    _press_button("F3m")
 
 
 def up():
-    driver.find_element_by_name("UP").click()
+    _press_button("UP")
 
 
 def down():
-    driver.find_element_by_name("DOWN").click()
+    _press_button("DOWN")
 
 
 def fx():
-    driver.find_element_by_name("FX").click()
+    _press_button("FX")
 
 
 def backward():
-    driver.find_element_by_name("BWD").click()
+    _press_button("BWD")
 
 
 def forward():
-    driver.find_element_by_name("FWD").click()
+    _press_button("FWD")
 
 
 def auto_approach():
-    driver.find_element_by_name("AUTO").click()
-
-
-def auto_approach():
-    driver.find_element_by_name("AUTO").click()
+    _press_button("AUTO")
