@@ -1,6 +1,8 @@
 # Oliver Gordon, 2019
 from time import sleep
+
 import numpy as np
+
 from nOmicron.mate import objects as mo
 
 
@@ -137,3 +139,38 @@ def tip_scratch(delta_z, end_pos, start_pos=None):
     # Return to start position
     mo.xy_scanner.Return_To_Stored_Position(True)
     mo.xy_scanner.Store_Current_Position(False)
+
+
+def ink():
+    pass
+
+
+from nOmicron.microscope import IO
+IO.connect()
+
+# TO SATURATE
+# Turn off feedback loop
+mo.regulator.Feedback_Loop_Enabled(False)
+# while True
+    # Lower dZ on regulator by increment
+    # Read current feedback loop for very short amount of time
+    # If mean has not changed much since last 10? times round (i.e. are we asymptoptic?)
+        # Take 5s reading
+        # If std is low (10% of mean?) (i.e. are we definitely asymmptotic?)
+            # Saturated
+            # break
+        # Else
+            # Continue
+
+# TO INK
+# while True:
+    # Increase dZ on regulator by increment
+    # Read current feedback loop for very short amount of time
+    # If mean has not changed much since last 10? times round (i.e. are we asymptoptic?)
+        # Take 5s reading
+        # If std is low (10% of mean?) (i.e. are we definitely asymmptotic?)
+            # Fully retracted
+            # Reenable feedback loop
+            # Break
+        # Else
+            # Continue

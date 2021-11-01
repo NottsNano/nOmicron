@@ -3,6 +3,7 @@
 from nOmicron.mate import objects as mo
 from nOmicron.utils import utils
 
+
 def connect():
     """Connect to the Matrix. Matrix must be open and initalised."""
 

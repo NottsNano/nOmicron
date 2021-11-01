@@ -248,6 +248,11 @@ class _PiezoControl(object):
 class _Regulator(object):
     """Controls the Z position of the probe."""
 
+    def TP_Disable(self, a=None, test=False):
+        p = 'boolean'
+        a = _process(p, [self, "TP_Disable"], a, test)
+        return a
+
     def Enable_Z_Offset_Slew_Rate(self, a=None, test=False):
         p = 'boolean'
         a = _process(p, [self, "Enable_Z_Offset_Slew_Rate"], a, test)
@@ -775,6 +780,11 @@ class _Spectroscopy:
         a = _process(p, [self, "Enable_Device_2_Ramp_Reversal"], a, test)
         return a
 
+class _CRTCService(object):
+    def RCSC(self, a=None, test=False):
+        p = 'unsigned_integer'
+        a = _process(p, [self, "RCSC"], a, test)
+        return a
 
 class _PLLControl(object):
     """Controls the PLL regulator"""
@@ -1099,5 +1109,6 @@ regulator = _Regulator()
 view = _View()
 xy_scanner = _XYScanner()
 spectroscopy = _Spectroscopy()
+crtcservice = _CRTCService()
 tot_packets = 0
 esc = False
