@@ -34,28 +34,34 @@ def _press_button(button_name):
     requests.get(f"http://{BLACK_BOX_IP}?{button_name}={button_name}")
 
 
-def x_plus():
-    _press_button("F1p")
+def x_plus(num_reps=1):
+    for _ in range(num_reps):
+        _press_button("F1p")
 
 
-def x_minus():
-    _press_button("F1m")
+def x_minus(num_reps=1):
+    for _ in range(num_reps):
+        _press_button("F1m")
 
 
-def y_plus():
-    _press_button("F2p")
+def y_plus(num_reps=1):
+    for _ in range(num_reps):
+        _press_button("F2p")
 
 
-def y_minus():
-    _press_button("F2m")
+def y_minus(num_reps=1):
+    for _ in range(num_reps):
+        _press_button("F2m")
 
 
-def z_plus():
-    _press_button("F3p")
+def z_plus(num_reps=1):
+    for _ in range(num_reps):
+        _press_button("F3p")
 
 
-def z_minus():
-    _press_button("F3m")
+def z_minus(num_reps=1):
+    for _ in range(num_reps):
+        _press_button("F3m")
 
 
 def up():
